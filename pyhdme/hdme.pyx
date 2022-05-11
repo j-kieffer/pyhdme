@@ -14,7 +14,7 @@ from cpython.int cimport PyInt_FromLong
 from sage.libs.gmp.mpz cimport mpz_get_si
 
 
-def something_else(
+def siegel_modeq_isog_invariants_Q_wrapper(
     j,
     ell
 ):
