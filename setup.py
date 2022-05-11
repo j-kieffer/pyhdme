@@ -39,7 +39,11 @@ allfiles_in_lib = [
 hdme_sources = [
     elt
     for elt in allfiles_in_lib
-    if elt.endswith(".c") and "test" not in elt and "time" not in elt
+    if elt.endswith(".c") and
+    "test/" not in elt and
+    "time/" not in elt and
+    "examples/" not in elt and
+    "programs/" not in elt
 ]
 
 hdme_data_files = [
