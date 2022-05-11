@@ -4,6 +4,7 @@
 # See LICENSE file for license details.
 
 
+from sage.libs.flint.types cimport fmpq, slong
 from cysignals.signals cimport sig_on, sig_off
 from memory_allocator cimport MemoryAllocator
 from sage.libs.flint.fmpq cimport fmpq_init, fmpq_clear, fmpq_get_mpq, fmpq_set_mpq
