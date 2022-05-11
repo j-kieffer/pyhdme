@@ -30,7 +30,7 @@ def siegel_modeq_isog_invariants_Q_wrapper(
         fmpq_set_mpq(&cj[i], (<Rational?>j[i]).value)
 
     sig_on()
-    siegel_modeq_isog_invariants_Q(&nb_roots, all_isog_j, cj, cell)
+    assert siegel_modeq_isog_invariants_Q(&nb_roots, all_isog_j, cj, cell) == 1
     sig_off()
 
     # convert all_isog_j to list of rationals:
