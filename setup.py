@@ -167,7 +167,7 @@ setup(
     install_requires=["cython", "sagemath", "sphinx"],
     packages=["pyhdme"],
     include_package_data=False,
-    ext_modules=cythonize([pyhdme], language="c"),
+    ext_modules=cythonize([pyhdme]),
     cmdclass={"test": SageTest}  # adding a special setup command for tests
     # ext_modules = extensions,
     # cmdclass = {'test': SageTest, 'build_ext': Cython.Build.build_ext} # adding a special setup command for tests and build_ext
