@@ -49,10 +49,8 @@ hdme_sources = [
 hdme_data_files = [
     os.path.relpath(elt, data_path)
     for elt in allfiles_in_lib
-    if elt.startswith(data_path) and not elt.endswith(".c")
+    if elt.startswith('pyhdme/lib/hdme_data/') and not elt.endswith(".c")
 ]
-
-
 
 
 
@@ -105,6 +103,7 @@ char* get_string_from_key(char *dest, const char *key)
                     count=1,
                     flags=re.MULTILINE)
     source = re.sub(fr'^(.*)(filename)(\);)$', r'\1name\3', source, flags=re.MULTILINE)
+    source = re.sub('Error reading file', 'Error reading table at hdme_data_read_static', source, flags=re.MULTILINE)
     source = "\n".join([headers, "".join(map(to_C, data_files)), lookup_table, source])
 
     with open(newfilename, 'w') as W:
@@ -126,6 +125,7 @@ if old in hdme_sources:
     hdme_sources.remove(old)
 if new not in hdme_sources:
     hdme_sources.append(new)
+
 
 
 pyhdme = Extension(
