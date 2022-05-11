@@ -118,8 +118,10 @@ def undo_patch_hdme_data_read():
 
 
 old, new = patch_hdme_data_read(hdme_data_files)
-hdme_sources.remove(old)
-hdme_sources.append(new)
+if old in hdme_sources:
+    hdme_sources.remove(old)
+if new not in hdme_sources:
+    hdme_sources.append(new)
 
 
 pyhdme = Extension(
