@@ -21,7 +21,7 @@ def something_else(
     assert ell.is_prime()
     cdef MemoryAllocator mem = MemoryAllocator()
     cdef slong nb_roots;
-    cdef fmpq* all_isog_j = <fmpq*>mem.calloc(ell^3 + ell^2 + ell + 1, sizeof(fmpq))
+    cdef fmpq* all_isog_j = <fmpq*>mem.calloc(3*(ell^3 + ell^2 + ell + 1), sizeof(fmpq))
     cdef fmpq* cj = <fmpq*>mem.calloc(3, sizeof(fmpq))
     cdef slong cell = mpz_get_si((<Integer?>ell).value)
     for i in range(3):
