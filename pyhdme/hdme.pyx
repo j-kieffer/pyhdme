@@ -86,7 +86,21 @@ def siegel_modeq_2step_isog_invariants_Q_wrapper(
     verbose=False
 ):
     r"""
-    TODO
+    Given the Igusa-Clebsch invariants `I_2, I_4, I_6, I_{10}` of Igusa and Clebsch [IJ1960]_
+    of an abelian surface compute the Igusa-Clebsch invariants of surfaces (ell,ell)^2-isogenous
+
+    INPUT:
+
+    - ``igusa_clebsch_invariants`` -- the Igusa-Clebsch invariants `I_2, I_4, I_6, I_{10}` of Igusa and Clebsch [IJ1960]_
+    - ``ell`` -- a prime number
+
+    OUTPUT:
+
+    - A list of Igusa-Clebsch invariants of abelian surfaces (ell, ell)-isogenous
+
+    Examples::
+
+
     """
     I2, I4, I6, I10 = igusa_clebsch_invariants
     absolute_invariants = igusa_clebsch_to_hdme_absolute_invariants(I2, I4, I6, I10)
