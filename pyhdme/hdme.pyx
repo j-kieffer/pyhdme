@@ -45,7 +45,7 @@ def siegel_modeq_isog_invariants_Q_wrapper(
 
     for i in range(3):
         fmpq_clear(&cj[i])
-    return ans
+    return [(ans[3*i], ans[3*i + 1], ans[3*i + 2]) for i in range(nb_roots)]
 
 
 def siegel_modeq_2step_isog_invariants_Q():
