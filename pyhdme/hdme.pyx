@@ -35,8 +35,8 @@ def siegel_modeq_isog_invariants_Q_wrapper(
     for i in range(3):
         fmpq_init(&cj[i])
         fmpq_set_mpq(&cj[i], (<Rational>j[i]).value)
-    for i in range(3*max_nb_roots):
-        fmpq_init(&all_isog_j[i]);
+    #for i in range(3*max_nb_roots):
+    #    fmpq_init(&all_isog_j[i]);
 
     sig_on()
     assert siegel_modeq_isog_invariants_Q(&nb_roots, all_isog_j, cj, cell) == 1
@@ -49,8 +49,8 @@ def siegel_modeq_isog_invariants_Q_wrapper(
     for i in range(3 * nb_roots_python):
         fmpq_get_mpq((<Rational>ans[i]).value, &all_isog_j[i])
 
-    #for i in range(3):
-    #    fmpq_clear(&cj[i])
+    for i in range(3):
+        fmpq_clear(&cj[i])
     #for i in range(3*max_nb_roots):
     #    fmpq_clear(&all_isog_j[i]);
     res = [(ans[3*i], ans[3*i + 1], ans[3*i + 2]) for i in range(nb_roots_python)]
