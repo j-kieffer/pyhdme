@@ -58,7 +58,7 @@ def siegel_modeq_isog_invariants_Q_wrapper(
     return res
 
 
-def siegel_modeq_2step_isog_invariants_Q(
+def siegel_modeq_2step_isog_invariants_Q_wrapper(
     absolute_invariants,
     ell,
     verbose=False
