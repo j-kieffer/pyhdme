@@ -15,9 +15,9 @@ cdef extern from "lib/modular.h":
         fmpq* j,
         slong ell)
 
-#    int siegel_modeq_2step_isog_invariants_Q(
-#        slong* nb_roots,
-#        fmpq* all_isog_j,
-#        fmpq* j,
-#        slong ell)
+    int siegel_modeq_2step_isog_invariants_Q(
+        slong* nb_roots,
+        fmpq* all_isog_j,
+        fmpq* j,
+        slong ell)
 
