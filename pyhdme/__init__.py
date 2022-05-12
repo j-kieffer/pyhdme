@@ -1,2 +1,4 @@
 from .hdme import siegel_modeq_isog_invariants_Q_wrapper
+from .hdme import siegel_modeq_2step_isog_invariants_Q_wrapper
 assert siegel_modeq_isog_invariants_Q_wrapper
+assert siegel_modeq_2step_isog_invariants_Q_wrapper
