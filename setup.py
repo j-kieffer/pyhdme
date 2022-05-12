@@ -46,10 +46,12 @@ hdme_sources = [
     "programs/" not in elt
 ]
 
+data_path_rel = 'pyhdme/lib/hdme_data/'
 hdme_data_files = [
     os.path.relpath(elt, data_path)
     for elt in allfiles_in_lib
-    if elt.startswith('pyhdme/lib/hdme_data/') and not elt.endswith(".c")
+    if any(elt.startswith(data_path_rel + d) for d in ['hilbert', 'humbert', 'igusa', 'mestre'])
+           and not elt.endswith(".c")
 ]
 
 
