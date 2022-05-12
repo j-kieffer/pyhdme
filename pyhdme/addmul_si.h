@@ -13,7 +13,7 @@
 #include <flint/fmpz.h>
 #include <flint/ulong_extras.h>
 
-#ifndef fmpz_addmul_si
+#if __FLINT_RELEASE < 20800 then
 void fmpz_addmul_si(fmpz_t f, const fmpz_t g, slong x)
 {
     fmpz F, G;
