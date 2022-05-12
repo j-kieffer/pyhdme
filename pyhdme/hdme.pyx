@@ -17,8 +17,11 @@ from sage.all import QQ, ZZ
 
 def siegel_modeq_isog_invariants_Q_wrapper(
     absolute_invariants,
-    ell
+    ell,
+    verbose=False
 ):
+    # cdef int cverbose = int(verbose)
+    # set_modeq_verbose(cverbose);
     assert len(absolute_invariants) == 3
     j = [QQ(elt) for elt in absolute_invariants]
     ell = ZZ(ell)
@@ -46,7 +49,9 @@ def siegel_modeq_isog_invariants_Q_wrapper(
 
     for i in range(3):
         fmpq_clear(&cj[i])
-    return [(ans[3*i], ans[3*i + 1], ans[3*i + 2]) for i in range(nb_roots_python)]
+    res = [(ans[3*i], ans[3*i + 1], ans[3*i + 2]) for i in range(nb_roots_python)]
+    print(res)
+    return res
 
 
 def siegel_modeq_2step_isog_invariants_Q():
