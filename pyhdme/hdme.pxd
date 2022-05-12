@@ -8,9 +8,6 @@ from sage.libs.flint.types cimport fmpq, slong
 cdef extern from "slong.h":
     pass
 
-cdef extern from "addmul_si.h":
-    pass
-
 cdef extern from "lib/modular.h":
     int siegel_modeq_isog_invariants_Q(
         slong* nb_roots,
