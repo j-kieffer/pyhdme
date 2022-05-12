@@ -25,7 +25,8 @@ def siegel_modeq_isog_invariants_Q_wrapper(
     assert ell.is_prime()
     cdef MemoryAllocator mem = MemoryAllocator()
     cdef slong nb_roots;
-    cdef fmpq* all_isog_j = <fmpq*>mem.calloc(3*(ell^3 + ell^2 + ell + 1), sizeof(fmpq))
+    max_nb_roots = ell^3 + ell^2 + ell + 1
+    cdef fmpq* all_isog_j = <fmpq*>mem.calloc(3 * max_nb_roots, sizeof(fmpq))
     cdef fmpq* cj = <fmpq*>mem.calloc(3, sizeof(fmpq))
     cdef slong cell = mpz_get_si((<Integer>ell).value)
     for i in range(3):
@@ -45,7 +46,7 @@ def siegel_modeq_isog_invariants_Q_wrapper(
 
     for i in range(3):
         fmpq_clear(&cj[i])
-    return [(ans[3*i], ans[3*i + 1], ans[3*i + 2]) for i in range(nb_roots)]
+    return [(ans[3*i], ans[3*i + 1], ans[3*i + 2]) for i in range(nb_roots_python)]
 
 
 def siegel_modeq_2step_isog_invariants_Q():
