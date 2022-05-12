@@ -45,6 +45,7 @@ def siegel_modeq_isog_invariants_Q_wrapper(
     # convert all_isog_j to list of rationals:
     cdef object nb_roots_python
     nb_roots_python = PyInt_FromLong(nb_roots)
+    assert nb_roots_python <= max_nb_roots;
     ans = [Rational(0) for _ in range(3*nb_roots_python)]
     for i in range(3 * nb_roots_python):
         fmpq_get_mpq((<Rational>ans[i]).value, &all_isog_j[i])
