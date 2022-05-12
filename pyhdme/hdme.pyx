@@ -54,7 +54,6 @@ def siegel_modeq_isog_invariants_Q_wrapper(
     for i in range(3*max_nb_roots):
         fmpq_clear(&all_isog_j[i]);
     res = [(ans[3*i], ans[3*i + 1], ans[3*i + 2]) for i in range(nb_roots_python)]
-    print(res)
     return res
 
 
