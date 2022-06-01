@@ -87,7 +87,7 @@ def siegel_modeq_2step_isog_invariants_Q_wrapper(
 ):
     r"""
     Given the Igusa-Clebsch invariants `I_2, I_4, I_6, I_{10}` of Igusa and Clebsch [IJ1960]_
-    of an abelian surface compute the Igusa-Clebsch invariants of surfaces (ell,ell)^2-isogenous
+    of an abelian surface compute the Igusa-Clebsch invariants of surfaces (ell,ell,ell^2)-isogenous
 
     INPUT:
 
