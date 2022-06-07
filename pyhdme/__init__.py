@@ -1,10 +1,4 @@
 from .hdme import (
-    siegel_modeq_isog_invariants_Q_wrapper,
-    siegel_modeq_2step_isog_invariants_Q_wrapper,
-    igusa_clebsch_to_hdme_absolute_invariants,
-    hdme_absolute_invariants_to_igusa_clebsch,
+    hecke_charpoly_wrapper
 )
-assert siegel_modeq_isog_invariants_Q_wrapper
-assert siegel_modeq_2step_isog_invariants_Q_wrapper
-assert igusa_clebsch_to_hdme_absolute_invariants
-assert hdme_absolute_invariants_to_igusa_clebsch
+assert hecke_charpoly_wrapper
