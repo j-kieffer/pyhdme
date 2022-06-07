@@ -4,10 +4,10 @@
 # See LICENSE file for license details.
 
 
-from sage.libs.flint.types cimport fmpz_poly_t, slong
+from sage.libs.flint.types cimport fmpz_t, fmpz_poly_t, slong
 from cysignals.signals cimport sig_on, sig_off
 from sage.libs.flint.fmpz cimport fmpz_init, fmpz_clear, fmpz_get_mpz
-from sage.libs.flint.fmpz_poly cimport fmpz_poly_init, fmpz_poly_clear, fmpz_poly_get_coeff_fmpz
+from sage.libs.flint.fmpz_poly cimport fmpz_poly_init, fmpz_poly_clear, fmpz_poly_get_coeff_fmpz, fmpz_poly_degree
 from sage.rings.integer cimport Integer
 from sage.rings.rational cimport Rational
 from cpython.int cimport PyInt_FromLong
