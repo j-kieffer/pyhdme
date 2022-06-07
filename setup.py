@@ -29,7 +29,6 @@ cythonize_dir = "build"
 
 path = os.path.dirname(os.path.abspath(__file__))
 lib_path = os.path.join(path, "pyhdme/lib")
-data_path = os.path.join(lib_path, "hdme_data")
 allfiles_in_lib = [
     os.path.relpath(os.path.join(dp, f), path)
     for dp, dn, fn in os.walk(os.path.expanduser(lib_path))
