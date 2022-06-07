@@ -6,7 +6,7 @@
 
 from sage.libs.flint.types cimport fmpz_t, fmpz_poly_t, slong
 from cysignals.signals cimport sig_on, sig_off
-from sage.libs.flint.fmpz cimport fmpz_init, fmpz_clear, fmpz_get_mpz, fmpz_print
+from sage.libs.flint.fmpz cimport fmpz_init, fmpz_clear, fmpz_get_mpz
 from sage.libs.flint.fmpz_poly cimport fmpz_poly_init, fmpz_poly_clear, fmpz_poly_get_coeff_fmpz, fmpz_poly_degree
 from sage.rings.integer cimport Integer
 from sage.rings.rational cimport Rational
@@ -64,15 +64,13 @@ def hecke_charpoly_wrapper(
     d_python = PyInt_FromLong(d)
     
     ans = Rational(0) * X
-    c = ZZ(0)
+    c = [ZZ(0) for _ in range(d_python+1)]
 
     for i in range(d_python+1):
         j = mpz_get_si((<Integer> ZZ(i)).value)
         fmpz_poly_get_coeff_fmpz(coeff, charpoly, j)
-	fmpz_print(coeff)
-        fmpz_get_mpz((<Integer> c).value, coeff)
-	print(c)
-        ans += c * X**i
+        fmpz_get_mpz((<Integer> c[i]).value, coeff)
+        ans += c[i] * X**i
 
     fmpz_poly_clear(charpoly)
     fmpz_clear(coeff)
