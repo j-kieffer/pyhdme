@@ -70,7 +70,7 @@ def hecke_charpoly_wrapper(
         j = mpz_get_si((<Integer> ZZ(i)).value)
         fmpz_poly_get_coeff_fmpz(coeff, charpoly, j)
         fmpz_get_mpz((<Integer> c[i]).value, coeff)
-        ans += c[i] * X**i
+        ans += c[i] * (X**i)
 
     fmpz_poly_clear(charpoly)
     fmpz_clear(coeff)
