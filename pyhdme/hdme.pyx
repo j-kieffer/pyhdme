@@ -45,7 +45,6 @@ def hecke_charpoly_wrapper(
     cdef fmpz_poly_t charpoly
     cdef fmpz_t coeff
     cdef slong d
-    cdef slong j
     
     cdef slong cell = mpz_get_si((<Integer>ell).value)
     cdef slong cwt = mpz_get_si((<Integer>wt).value)
@@ -68,10 +67,11 @@ def hecke_charpoly_wrapper(
 
     for i in range(d_python+1):
         print ZZ(i)
-        j = mpz_get_si((<Integer> ZZ(i)).value)
+#        j = mpz_get_si((<Integer> ZZ(i)).value)
         print i
-        print j
-        fmpz_poly_get_coeff_fmpz(coeff, charpoly, j)        
+#        print j
+#        print int(j)
+        fmpz_poly_get_coeff_fmpz(coeff, charpoly, i)        
         fmpz_get_mpz((<Integer> c[i]).value, coeff)
         print c[i];
         ans += c[i] * (X**i)
