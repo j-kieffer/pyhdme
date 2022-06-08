@@ -67,14 +67,15 @@ def hecke_charpoly_wrapper(
     c = [ZZ(0) for _ in range(d_python+1)]
 
     for i in range(d_python+1):
+        print ZZ(i)
         j = mpz_get_si((<Integer> ZZ(i)).value)
-        print i;
-        print j;
+        print i
+        print j
         fmpz_poly_get_coeff_fmpz(coeff, charpoly, j)        
         fmpz_get_mpz((<Integer> c[i]).value, coeff)
         print c[i];
         ans += c[i] * (X**i)
-        print ans;
+        print ans
 
     fmpz_poly_clear(charpoly)
     fmpz_clear(coeff)
