@@ -57,8 +57,6 @@ def hecke_charpoly_wrapper(
     assert hecke_charpoly(charpoly, cell, cwt) == 1
     sig_off()
 
-    printf("cell, cwt: %d, %d\n", cell, cwt);
-
     d = fmpz_poly_degree(charpoly)
 
     # convert charpoly to polynomial
@@ -70,9 +68,13 @@ def hecke_charpoly_wrapper(
 
     for i in range(d_python+1):
         j = mpz_get_si((<Integer> ZZ(i)).value)
-        fmpz_poly_get_coeff_fmpz(coeff, charpoly, j)
+        print i;
+        print j;
+        fmpz_poly_get_coeff_fmpz(coeff, charpoly, j)        
         fmpz_get_mpz((<Integer> c[i]).value, coeff)
+        print c[i];
         ans += c[i] * (X**i)
+        print ans;
 
     fmpz_poly_clear(charpoly)
     fmpz_clear(coeff)
