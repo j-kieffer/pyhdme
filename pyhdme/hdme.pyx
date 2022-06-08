@@ -3,7 +3,7 @@
 # Copyright 2022 Edgar Costa
 # See LICENSE file for license details.
 
-
+from libc.stdio cimport printf
 from sage.libs.flint.types cimport fmpz_t, fmpz_poly_t, slong
 from cysignals.signals cimport sig_on, sig_off
 from sage.libs.flint.fmpz cimport fmpz_init, fmpz_clear, fmpz_get_mpz
@@ -56,6 +56,8 @@ def hecke_charpoly_wrapper(
     sig_on()
     assert hecke_charpoly(charpoly, cell, cwt) == 1
     sig_off()
+
+    printf("cell, cwt: %d, %d\n", cell, cwt);
 
     d = fmpz_poly_degree(charpoly)
 
