@@ -55,7 +55,7 @@ def hecke_charpoly_wrapper(
     d = fmpz_poly_degree(charpoly)
     
     ans = Rational(0) * X
-    c = [ZZ(0) for _ in range(d_python+1)]
+    c = [ZZ(0) for _ in range(d+1)]
 
     for i in range(d+1):
         fmpz_poly_get_coeff_fmpz(coeff, charpoly, i)        
