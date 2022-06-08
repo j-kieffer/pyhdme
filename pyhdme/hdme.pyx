@@ -38,9 +38,8 @@ def hecke_charpoly_wrapper(
 
     """
     
-    ell = ZZ(ell)
-    wt = ZZ(wt)
-    assert ell.is_prime()
+    assert ZZ(ell).is_prime()
+    assert wt % 2 == 0 and wt >= 4
     
     cdef fmpz_poly_t charpoly
     cdef fmpz_t coeff
@@ -58,7 +57,7 @@ def hecke_charpoly_wrapper(
     c = [ZZ(0) for _ in range(d+1)]
 
     for i in range(d+1):
-        fmpz_poly_get_coeff_fmpz(coeff, charpoly, i)        
+        fmpz_poly_get_coeff_fmpz(coeff, charpoly, i)
         fmpz_get_mpz((<Integer> c[i]).value, coeff)
         ans += c[i] * (X**i)
 
