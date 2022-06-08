@@ -44,38 +44,23 @@ def hecke_charpoly_wrapper(
     
     cdef fmpz_poly_t charpoly
     cdef fmpz_t coeff
-    cdef slong d
-    
-    cdef slong cell = mpz_get_si((<Integer>ell).value)
-    cdef slong cwt = mpz_get_si((<Integer>wt).value)
     
     fmpz_poly_init(charpoly)
     fmpz_init(coeff)
 
     sig_on()
-    assert hecke_charpoly(charpoly, cell, cwt) == 1
+    assert hecke_charpoly(charpoly, ell, wt) == 1
     sig_off()
 
     d = fmpz_poly_degree(charpoly)
-
-    # convert charpoly to polynomial
-    cdef object d_python
-    d_python = PyInt_FromLong(d)
     
     ans = Rational(0) * X
     c = [ZZ(0) for _ in range(d_python+1)]
 
-    for i in range(d_python+1):
-        print ZZ(i)
-#        j = mpz_get_si((<Integer> ZZ(i)).value)
-        print i
-#        print j
-#        print int(j)
+    for i in range(d+1):
         fmpz_poly_get_coeff_fmpz(coeff, charpoly, i)        
         fmpz_get_mpz((<Integer> c[i]).value, coeff)
-        print c[i];
         ans += c[i] * (X**i)
-        print ans
 
     fmpz_poly_clear(charpoly)
     fmpz_clear(coeff)
