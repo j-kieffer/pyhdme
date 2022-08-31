@@ -46,87 +46,10 @@ hdme_sources = [
     "programs/" not in elt
 ]
 
-data_path_rel = 'pyhdme/lib/hdme_data/'
-hdme_data_files = [
-    os.path.relpath(elt, data_path)
-    for elt in allfiles_in_lib
-    if any(elt.startswith(data_path_rel + d) for d in ['hilbert', 'humbert', 'igusa', 'mestre'])
-           and not elt.endswith(".c")
-]
 
 
 
 
-def patch_hdme_data_read(data_files):
-    def to_C(filename):
-        value = readfile(os.path.join(data_path, filename))
-        hex_value = [format(c, '#04x') for c in value.encode('ascii')] + ['0x00'] # null terminated
-        varname = filename.replace('/', '_')
-        return f'/*\n{value}\n*/\nstatic const char {varname}[] = {{{", ".join(hex_value)}}};\n'
-
-    headers = """
-#include <stdint.h>
-#include <string.h>
-
-#include "hdme_data.h"
-"""
-    C_lookup = "{\n" + ",\n".join([
-        f'{{"{elt}", {elt.replace("/", "_")}}}'
-        for elt in data_files]) + "\n}"
-    lookup_table = """
-typedef struct { char *key; const char *val; } pair;
-static pair lookuptable[] = %s;
-#define NKEYS (sizeof(lookuptable)/sizeof(pair))
-
-char* get_string_from_key(char *dest, const char *key)
-{
-    size_t i; /* GCC does not allow variable declarations in for loop initializers before C99 */
-    for(i=0; i < NKEYS; ++i) {
-        pair *item = lookuptable + i;
-        if (strcmp(item->key, key) == 0)
-            return strcpy(dest, item->val);
-    }
-    return NULL;
-}
-
-""" % (C_lookup,)
-
-    filename = "pyhdme/lib/hdme_data/hdme_data_read.c"
-    newfilename = "pyhdme/lib/hdme_data/hdme_data_read_static.c"
-    oldfilename = filename + ".old"
-    if not os.path.exists(oldfilename):
-        os.rename(filename, oldfilename)
-    source = readfile(oldfilename)
-    # comment out lines starting with
-    for elt in ['#include', 'char filename', 'FILE', 'file', 'flint_sprintf', 'fclose']:
-        source = re.sub(fr'^(\s+)({elt}.*)$', r'\1/*\2*/', source, count=1, flags=re.MULTILINE)
-    source = re.sub(r'^(\s+)(success.*)$', r'\1/*\2*/\n\1success = get_string_from_key(str, name);\n',
-                    source,
-                    count=1,
-                    flags=re.MULTILINE)
-    source = re.sub(fr'^(.*)(filename)(\);)$', r'\1name\3', source, flags=re.MULTILINE)
-    source = re.sub('Error reading file', 'Error reading table at hdme_data_read_static', source, flags=re.MULTILINE)
-    source = "\n".join([headers, "".join(map(to_C, data_files)), lookup_table, source])
-
-    with open(newfilename, 'w') as W:
-        W.write(source)
-    return filename, newfilename
-
-def undo_patch_hdme_data_read():
-    filename = "pyhdme/lib/hdme_data/hdme_data_read.c"
-    newfilename = "pyhdme/lib/hdme_data/hdme_data_read_static.c"
-    oldfilename = filename + ".old"
-    if os.path.exists(oldfilename):
-        os.rename(oldfilename, filename)
-    if os.path.exists(newfilename):
-        os.remove(newfilename)
-
-
-old, new = patch_hdme_data_read(hdme_data_files)
-if old in hdme_sources:
-    hdme_sources.remove(old)
-if new not in hdme_sources:
-    hdme_sources.append(new)
 
 
 
@@ -139,6 +62,7 @@ pyhdme = Extension(
     + hdme_sources,
     libraries=["arb", "flint", "mpfr", "gmp", "pthread", "m"],
     include_dirs=sage_include_directories() + ["pyhdme/lib/"],
+    extra_compile_args=["-Wno-sign-compare"],
 )
 
 setup(
@@ -175,4 +99,3 @@ setup(
     # cmdclass = {'test': SageTest, 'build_ext': Cython.Build.build_ext} # adding a special setup command for tests and build_ext
 )
 
-undo_patch_hdme_data_read()
