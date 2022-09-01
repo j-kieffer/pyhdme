@@ -36,6 +36,7 @@ def rescale(c, I, weights):
 def canonicalize_rational_invariants(I, weights):
     assert len(I) == len(weights)
     I = [QQ(elt) for elt in I]
+    weights = [ZZ(w) for w in weights] # for the divisions below
     # make it integral
     for i, w in enumerate(weights):
         if I[i] == 0:
@@ -122,7 +123,7 @@ def generic_wrapper(
     sig_on()
     for i in range(nb_roots_python):
         #print_vector(&all_isog_I[4*i], 4)
-        #igusa_IC_fmpz(&all_isog_I[4*i], &all_isog_I[4*i])
+        igusa_IC_fmpz(&all_isog_I[4*i], &all_isog_I[4*i])
         #print_vector(&all_isog_I[4*i], 4)
         #printf("##\n")
         r = [Integer(0) for _ in range(4)]
@@ -136,7 +137,7 @@ def generic_wrapper(
     for i in range(4*max_nb_roots):
         fmpz_clear(&all_isog_I[i]);
 
-    return [ic_from_igusa(elt) for elt in res]
+    return [canonicalize_igusa_clebsch_invariants(elt) for elt in res]
 
 
 def siegel_modeq_2step_isog_invariants_Q_wrapper(
