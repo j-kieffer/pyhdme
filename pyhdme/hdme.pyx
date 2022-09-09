@@ -154,7 +154,7 @@ def generic_wrapper(
 
     cdef object nb_roots_python
     nb_roots_python = PyInt_FromLong(nb_roots)
-    assert nb_roots_python <= max_nb_roots;
+    assert nb_roots_python <= max_nb_roots, f"{nb_roots_python} > {max_nb_roots}"
 
     res = []
     for i in range(nb_roots_python):
