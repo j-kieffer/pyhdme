@@ -10,7 +10,7 @@ from memory_allocator cimport MemoryAllocator
 from sage.libs.flint.fmpz cimport fmpz_init, fmpz_clear, fmpz_get_mpz, fmpz_set_mpz, fmpz_print
 from sage.rings.integer cimport Integer
 from sage.rings.rational cimport Rational
-from cpython.long cimport PyLong_FromLongLong 
+from cpython.int cimport PyLong_FromLongLong
 from sage.libs.gmp.mpz cimport mpz_get_si
 from sage.all import (
     ZZ,
