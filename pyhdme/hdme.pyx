@@ -10,8 +10,8 @@ from memory_allocator cimport MemoryAllocator
 from sage.libs.flint.fmpz cimport fmpz_init, fmpz_clear, fmpz_get_mpz, fmpz_set_mpz, fmpz_print
 from sage.rings.integer cimport Integer
 from sage.rings.rational cimport Rational
-from cython.int cimport PyLong_FromLongLong
-from sage.libs.gmp.mpz cimport mpz_get_si
+#from cython.long cimport PyLong_FromLongLong
+from sage.libs.gmp.mpz cimport mpz_get_si, mpz_set_si
 from sage.all import (
     ZZ,
     QQ,
@@ -152,7 +152,8 @@ def generic_wrapper(
     sig_off()
 
     nb_roots_python = Integer(0)
-    nb_roots_python = PyLong_FromLongLong(nb_roots)
+    mpz_set_si(nb_roots_python.value, nb_roots)
+    #nb_roots_python = PyLong_FromLongLong(nb_roots)
     assert nb_roots_python <= max_nb_roots, f"{nb_roots_python} > {max_nb_roots}"
 
     res = []
