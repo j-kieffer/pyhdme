@@ -151,9 +151,8 @@ def generic_wrapper(
         assert siegel_2step_direct_isog_Q(&nb_roots, all_isog_M, cM, cell) == 1
     sig_off()
 
-
-    cdef object nb_roots_python
-    nb_roots_python = PyInt_FromLong(nb_roots)
+    nb_roots_python = Integer(0)
+    nb_roots_python = PyLong_FromLongLong(nb_roots)
     assert nb_roots_python <= max_nb_roots, f"{nb_roots_python} > {max_nb_roots}"
 
     res = []
