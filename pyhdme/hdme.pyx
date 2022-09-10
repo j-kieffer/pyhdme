@@ -124,7 +124,7 @@ def generic_wrapper(
     verbose=False
 ):
     cdef int cverbose = int(verbose)
-    for elt in [set_modeq_verbose, set_hecke_verbose]:
+    for elt in [set_modeq_verbose, set_hecke_verbose, set_thomae_verbose]:
         elt(cverbose)
     assert steps in [1,2]
     assert len(modular_igusa_invariants) == 4
