@@ -1,6 +1,3 @@
 [submodule "pyhdme/lib"]
 	path = pyhdme/lib
 	url = https://github.com/j-kieffer/hdme.git
-[submodule "pyhdme/arb"]
-	path = pyhdme/arb
-	url = git@github.com:j-kieffer/arb.git
