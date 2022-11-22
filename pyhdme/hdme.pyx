@@ -3,15 +3,15 @@
 # Copyright 2022 Edgar Costa
 # See LICENSE file for license details.
 
-from sage.libs.flint.types cimport fmpz, slong
-from sage.libs.flint.fmpz_vec cimport _fmpz_vec_clear, _fmpz_vec_init
 from cysignals.signals cimport sig_on, sig_off
 from memory_allocator cimport MemoryAllocator
+from openmp cimport omp_set_num_threads
 from sage.libs.flint.fmpz cimport fmpz_init, fmpz_clear, fmpz_get_mpz, fmpz_set_mpz, fmpz_print
+from sage.libs.flint.fmpz_vec cimport _fmpz_vec_clear, _fmpz_vec_init
+from sage.libs.flint.types cimport fmpz, slong
+from sage.libs.gmp.mpz cimport mpz_get_si, mpz_set_si
 from sage.rings.integer cimport Integer
 from sage.rings.rational cimport Rational
-#from cython.long cimport PyLong_FromLongLong
-from sage.libs.gmp.mpz cimport mpz_get_si, mpz_set_si
 from sage.all import (
     ZZ,
     QQ,
@@ -121,8 +121,12 @@ def generic_wrapper(
     steps,
     modular_igusa_invariants,
     ell,
-    verbose=False
+    verbose=False,
+    threads=1
 ):
+    cdef int cthreads = int(threads)
+    omp_set_num_threads(cthreads)
+    # flint_set_num_threads(cthreads); # doesn't seem to make a difference
     cdef int cverbose = int(verbose)
     for elt in [set_modeq_verbose, set_hecke_verbose, set_thomae_verbose]:
         elt(cverbose)
@@ -170,12 +174,13 @@ def generic_wrapper(
 
 
 def siegel_modeq_2step_isog_invariants_Q_wrapper(
-      modular_igusa_invariants,
-      ell,
-      verbose=False
+    modular_igusa_invariants,
+    ell,
+    verbose=False,
+    threads=1
 ):
     r"""
-    Given the modular Igusa invariants `psi_4, psi_6, chi_{10}, chi_{12}`
+Given the modular Igusa invariants `psi_4, psi_6, chi_{10}, chi_{12}`
     of an abelian surface compute the same invariants of surfaces (ell,ell,ell^2)-isogenous
 
     INPUT:
@@ -192,15 +197,16 @@ def siegel_modeq_2step_isog_invariants_Q_wrapper(
 
 
     """
-    return generic_wrapper(2, modular_igusa_invariants, ell, verbose=verbose)
+    return generic_wrapper(2, modular_igusa_invariants, ell, verbose=verbose, threads=threads)
 
 def siegel_modeq_isog_invariants_Q_wrapper(
-      modular_igusa_invariants,
-      ell,
-      verbose=False
+    modular_igusa_invariants,
+    ell,
+    verbose=False,
+    threads=1
 ):
     r"""
-    Given the modular Igusa invariants `psi_4, psi_6, chi_{10}, chi_{12}`
+Given the modular Igusa invariants `psi_4, psi_6, chi_{10}, chi_{12}`
     of an abelian surface compute the same invariants of surfaces (ell,ell)-isogenous
 
     INPUT:
@@ -217,5 +223,5 @@ def siegel_modeq_isog_invariants_Q_wrapper(
 
 
     """
-    return generic_wrapper(1, modular_igusa_invariants, ell, verbose=verbose)
+    return generic_wrapper(1, modular_igusa_invariants, ell, verbose=verbose, threads=threads)
 

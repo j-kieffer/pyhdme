@@ -8,6 +8,9 @@ from sage.libs.flint.types cimport fmpz, slong
 cdef extern from "slong.h":
     pass
 
+cdef extern from "flint/flint.h":
+    void flint_set_num_threads(int num_threads);
+
 
 cdef extern from "lib/modular.h":
     int siegel_direct_isog_Q(slong* nb, fmpz* all_I, fmpz* I, slong ell);

@@ -46,6 +46,12 @@ hdme_sources = [
     "programs/" not in elt
 ]
 
+if sys.platform == "darwin":
+    libopenmp = ["omp"]
+    openmpflags = ["-Xpreprocessor", "-fopenmp"]
+else:
+    libopenmp = []
+    openmpflags = ["-fopenmp"]
 
 
 
@@ -60,9 +66,10 @@ pyhdme = Extension(
         "pyhdme/hdme.pyx",
     ]
     + hdme_sources,
-    libraries=["arb", "flint", "mpfr", "gmp", "pthread", "m"],
+    libraries=["arb", "flint", "mpfr", "gmp", "pthread", "m"] + libopenmp,
     include_dirs=sage_include_directories() + ["pyhdme/lib/"],
-    extra_compile_args=["-Wno-sign-compare"],
+    extra_compile_args=["-Wno-sign-compare"] + openmpflags,
+    extra_link_args=openmpflags,
 )
 
 setup(
