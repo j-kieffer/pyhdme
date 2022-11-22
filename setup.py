@@ -53,7 +53,7 @@ if sys.platform == "darwin":
 else:
     libopenmp = []
     openmpflags = ["-fopenmp"]
-    lt = [lt]
+    lt = ["lt"]
 
 
 
