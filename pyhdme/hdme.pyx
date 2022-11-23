@@ -128,7 +128,7 @@ def generic_wrapper(
     omp_set_num_threads(cthreads)
     # flint_set_num_threads(cthreads); # doesn't seem to make a difference
     cdef int cverbose = int(verbose)
-    for elt in [set_modeq_verbose, set_hecke_verbose, set_thomae_verbose]:
+    for elt in [set_modeq_verbose, set_hecke_verbose, set_thomae_verbose, set_siegel_verbose]:
         elt(cverbose)
     assert steps in [1,2]
     assert len(modular_igusa_invariants) == 4
