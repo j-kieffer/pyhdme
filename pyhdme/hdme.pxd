@@ -22,8 +22,9 @@ cdef extern from "lib/igusa.h":
 
 
 cdef extern from "lib/verbose.h":
-    int set_modeq_verbose(int i)
     int set_hecke_verbose(int i)
+    int set_modeq_verbose(int i)
+    int set_siegel_verbose(int i)
     int set_thomae_verbose(int i)
 
 
