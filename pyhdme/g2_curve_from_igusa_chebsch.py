@@ -20,22 +20,6 @@ def g2_curve_safe_is_nonzero(x):
     except:
         return not x.is_zero()
 
-### Conversions between invariants ###
-
-# This includes rescaling to keep the quantities integral.
-def g2_curve_clebsch_from_igusa_clebsch(IC):
-    I2, I4, I6, I10 = IC
-    A = -I2 * (60**2 /120)
-    B = (I4 + 720 * I2**2) * (60**4 / 6750)
-    C = (I6 - 8640 * I2**3 + 108000 * I2 * I4) * (60**6 / 202500)
-    D = (I10 + 62208 * I2**5 - 972000 * I2**3 * I4 - 1620000 * I2**2 * I6 + 3037500 * I2 * I4**2 + 6075000 * I4 * I6) * (- 60**10/4556250)
-    return [A,B,C,D]
-
-def g2_curve_R2_from_igusa_clebsch(IC):
-    a, b, c, d = IC
-    R2 = 125971200000 * d**3 + 236196 * d**2 * a**5 + 19245600 * d**2 * a**3 * b - 507384000 * d**2 * a * b**2 - 972 * d * a**6 * b**2 - 77436 * d * a**4 * b**3 + 592272 * d * a**2 * b**4 + a**7 * b**4 - 41472 * d * b**5 + 78 * a**5 * b**5 - 159 * a**3 * b**6 + 80 * a * b**7 - 104976000 * d**2 * a**2 * c + 2099520000 * d**2 * b * c + 5832 * d * a**5 * b * c + 870912 * d * a**3 * b**2 * c - 4743360 * d * a * b**3 * c - 12 * a**6 * b**3 * c - 1332 * a**4 * b**4 * c + 1728 * a**2 * b**5 * c - 384 * b**6 * c - 8748 * d * a**4 * c**2 - 3090960 * d * a**2 * b * c**2 + 9331200 * d * b**2 * c**2 + 54 * a**5 * b**2 * c**2 + 8910 * a**3 * b**3 * c**2 - 6048 * a * b**4 * c**2 + 3499200 * d * a * c**3 - 108 * a**4 * b * c**3 - 29376 * a**2 * b**2 * c**3 + 6912 * b**3 * c**3 + 81 * a**3 * c**4 + 47952 * a * b * c**4 - 31104 * c**5
-    return R2
-
 ### Detecting curves with specific automorphism groups ###
 
 def g2_curve_has_generic_automorphisms(IC):
