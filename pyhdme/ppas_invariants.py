@@ -37,12 +37,12 @@ class PPASInvariants(SageObject):
     4. The modified Igusa--Clebsch invariants I_4, I_6', I_{10}, I_{12}.
 
     5. The absolute Igusa invariants, defined as follows:
-    j_1 = I_4*I_6/I_{10}, j_2 = I_4^2*I_{12}/I_{10}^2, j_3 = I_4^5/I_{10}^2.
+    j_1 = I_4*I_6'/I_{10}, j_2 = I_4^2*I_{12}/I_{10}^2, j_3 = I_4^5/I_{10}^2.
 
     6. The equation of a genus 2 curve y^2 = f(x), represented as the
     polynomial f(x) of degree 5 or 6.
 
-    7. A pair of j-invariants of elliptic curves.
+    7. The coefficients a6, ..., a0 of such a polynomial f = a6 x^6 + ... + a0.
 
     8. A pair of equations of elliptic curves.
 
@@ -188,8 +188,11 @@ class PPASInvariants(SageObject):
         self.ic = None
         self.clebsch = None
         self.ic_mod = None
+        self.U = None
         self.j_invariants = None
 
+        self.mestre_conic = None
+        self.mestre_line = None
         self.aut_gp = None
 
         if isinstance(data, CommutativePolynomial):
@@ -499,14 +502,14 @@ class PPASInvariants(SageObject):
             return self.aut_gp
 
         if not self.base_ring.is_exact():
-            raise NotImplementedError("Automorphism groups are not currently implemented over inexact fields")
+            raise NotImplementedError("Automorphism group computation is not currently implemented over inexact fields")
         if self.is_geometrically_split():
             raise NotImplementedError("Automorphism groups are not currently implemented for products of elliptic curves")
 
         R2 = self.R2_invariant()
         A, B, C, D = self.clebsch_invariants()
         if R2 != 0 and (A != 0 or B != 0 or C != 0):
-            return AbelianGroup([2])
+            self.aut_gp = AbelianGroup([2])
         elif R2 != 0:
             pass
         elif B == 0 and C == 0 and D == 0:
@@ -519,11 +522,172 @@ class PPASInvariants(SageObject):
             pass
         else:
             pass
+        return self.aut_gp
+
+    def mestre_conic_coefficients(self):
+        r"""
+        Return Mestre's conic attached to the specified set of invariants as a
+        set of 6 coefficients t11, t22, t33, t23, t31, t12 encoding the conic
+        equation t11 * x^2 + t12 * x * y + ... + t33 * z^2 = 0.
+
+        EXAMPLES::
+
+            sage:
+
+        TESTS::
+
+            sage:
+
+        """
+        if not self.conic is None:
+            return self.conic
+
+        if not self.base_ring().is_exact():
+            raise ValueError("Mestre conic not implemented over inexact base fields")
+        if self.is_geometrically_split():
+            raise ValueError("Mestre conic not available for geometrically split surfaces")
+        A, B, C, D = self.clebsch_invariants()
+        I10 = self.igusa_clebsch_invariants()[3]
+        if A != 0:
+            self.U = A**6
+        elif B != 0:
+            self.U = B**3
+        elif C != 0:
+            self.U = C**2
+        else:
+            raise ValueError("Could not find nonzero invariant of weight 12")
+        U = self.U
+        c11 = 2 * C + A * B/3
+        c22 = D
+        c33 = B * D/2 + 2 * C * (B**2 + A * C)/9
+        c23 = B * (B**2 + A * C)/3 + C * (2 * C + A * B/3)/3
+        c31 = D
+        c12 = 2 * (B**2 + A * C)/3
+
+        t11 = U**2 * I10**8 * c11
+        t22 = I10**10 * c22
+        t33 = U**8 * c33
+        t23 = U**4 * I10**5 * c23
+        t31 = U**5 * I10**4 * c31
+        t12 = U * I10**9 * c12
+        self.mestre_conic = Sequence([t11, t22, t33, t23, t31, t12], universe = self.base_ring())
+        return self.mestre_conic
+
+    @cached
+    def mestre_conic(self):
+        r"""
+        Return Mestre's conic attached to the specified set of invariants as a
+        Conic object.
+
+        EXAMPLES::
+
+            sage:
+
+        TESTS::
+
+            sage:
+
+        """
+        return Conic(self.mestre_conic_coefficients())
+
+    def mestre_line(self):
+        r"""
+        Return integers a2, a3, b2, b3 such that the parametric line x = t,
+        y = a2 * t + b2, z = a3 * t + b3 intersects the Mestre conic in two
+        distinct (non necessarily rational) points.
+
+        EXAMPLES::
+
+            sage:
+
+        TESTS::
+
+            sage:
+
+        """
+        if not self.mestre_line is None:
+            return self.mestre_line
+
+        if not self.base_ring().is_exact():
+            raise ValueError("Mestre line computation not implemented over inexact base rings")
+        R.<t> = PolynomialRing(self.base_ring())
+        for i in range(5**4):
+            a2 = i % 5
+            a3 = (i // 5) % 5
+            b2 = 1 + (i // 25) % 5
+            b3 = 1 + (i // 125) % 5
+
+            x = t
+            y = a2 * t + b2
+            z = a3 * t + b3
+            c11, c22, c33, c23, c31, c12 = self.mestre_conic_coefficients()
+            substitution = c11 * x**2 + c22 * y**2 + c33 * z**2 + c23 * y * z + c31 * x * z + c12 * x * y
+            c0, c1, c2 = [substitution.coefficient(i) for i in range(3)]
+            delta = c1**2 - 4 * c1 * c2
+            if delta != 0 and c2 != 0:
+                self.mestre_line = Sequence([a2, a3, b2, b3], universe = self.base_ring())
+                break
+        return self.mestre_line
+
+    @cached
+    def mestre_conic_point(self):
+        r"""
+        Return a point over Mestre's conic defined over the base ring of self,
+        raising a :class:`ValueError` if no such point can be found.
+
+        EXAMPLES::
+
+            sage:
+
+        TESTS::
+
+            sage:
+
+        """
+        try:
+            return self.mestre_conic().rational_point()
+        except NotImplementedError:
+            a2, a3, b2, b3 = self.mestre_line()
+            R.<t> = PolynomialRing(self.base_ring())
+            x = t
+            y = a2 * t + b2
+            z = a3 * t + b3
+            c11, c22, c33, c23, c31, c12 = self.mestre_conic_coefficients()
+            substitution = c11 * x**2 + c22 * y**2 + c33 * z**2 + c23 * y * z + c31 * x * z + c12 * x * y
+            c0, c1, c2 = [substitution.coefficient(i) for i in range(3)]
+            delta = c1**2 - 4 * c1 * c2
+            try:
+                s = self.base_ring()(sqrt(delta))
+            except ValueError, TypeError:
+                raise ValueError("Could not extract a square root of {} in {}".format(delta, base_ring))
+            x = (- c1 + s) / (2 * c2)
+            y = a2 * x + b2
+            z = a3 * x + b3
+            return [x, y, z]
 
     def genus_2_curve_equation(self):
         if self.g2_curve is None:
             if self.is_geometrically_split():
                 raise ValueError("The given PPAS is geometrically split")
+
+            # Compute parametrization of Mestre's conic
+            x0, y0, z0 = self.mestre_conic_point()
+            c11, c22, c23, c23, c31, c12 = self.mestre_conic_coefficients()
+            
+            U = self.U
+            I10 = self.igusa_clebsch_invariants()[3]
+    A, B, C, D = ABCD
+    c111 = 8 * (A**2 * C - 6 * B * C + 9 * D)/36
+    c112 = 4 * (2 * B**3 + 4 * A * B * C + 12 * C**2 + 3 * A * D)/36
+    c113 = 4 * (A * B**3 + 4 * A**2 * B * C/3 + 4 * B**2 * C + 6 * A * C**2 + 3 * B * D)/36
+    c122 = 4 * (A * B**3 + 4 * A**2 * B * C/3 + 4 * B**2 * C + 6 * A * C**2 + 3 * B * D)/36
+    c123 = 2 * (2 * B**4 + 4 * A * B**2 * C + 4 * A**2 * C**2/3 + 4 * B * C**2 + 3 * A * B * D + 12 * C * D)/36
+    c133 = 2 * (A * B**4 + 4 * A**2 * B**2 * C/3 + 16 * B**3 * C/3 + 26 * A * B * C**2/3 +  8 * C**3 + 3 * B**2 * D + 2 * A * C * D)/36
+    c222 = 4 * (3 * B**4 + 6 * A * B**2 * C + 8 * A**2 * C**2/3 + 2 * B * C**2 - 3 * C * D)/36
+    c223 = 2 * (-2 * B**3 * C/3 - 4 * A * B * C**2/3 - 4 * C**3 + 9 * B**2 * D + 8 * A * C * D)/36
+    c233 = 2 * (B**5 + 2 * A * B**3 * C + 8 * A**2 * B * C**2/9 + 2 * B**2 * C**2/3  - B * C * D + 9 * D**2)/36
+    c333 = 1 * (-2 * B**4 * C - 4 * A * B**2 * C**2 - 16 * A**2 * C**3/9 - 4 * B * C**3/3  + 9 * B**3 * D + 12 * A * B * C * D + 20 * C**2 * D)/36
+            
             self.g2_curve = g2_curve_from_igusa_clebsch(self.igusa_clebsch_invariants())
         return self.g2_curve
 
