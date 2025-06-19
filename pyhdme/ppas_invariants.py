@@ -136,7 +136,7 @@ class PPASInvariants(SageObject):
         I10 = - 62208 * A**5 + 972000 * A**3 * B + 1620000 * A**2 * C - 3037500 * A * B**2 - 6075000 * B * C - 4556250 * D
         return [I2, I4, I6, I10]
 
-    def modified_igusa_clebsch_from_curve_coefficients(vec):
+    def modified_igusa_clebsch_from_curve(vec):
         r"""
         Return the modified Igusa--Clebsch invariants from the given vector
         of curve coefficients. Todo: rewrite this in terms of transvectants
@@ -157,6 +157,62 @@ class PPASInvariants(SageObject):
         I6p = -14580 * g**3 * a**3 + (7290 * g**2 * f * b + ((16524 * g**2 * e -8100 * g * f**2) * c + (-18954 * g**2 * d**2 + (17010 * g * f * e - 3375 * f**3) * d+ (-5616 * g * e**3 + 1350 * f**2 * e**2)))) * a**2 + ((-8100 * g**2 * e +2160 * g * f**2) * b**2 + ((17010 * g**2 * d + (-11448 * g * f * e +3600 * f**3)) * c + (-2187 * g * f * d**2 + (2754 * g * e**2 - 810 * f**2 * e) * d +36 * f * e**3)) * b + (-5616 * g**2 * c**3 + (2754 * g * f * d + (2916 * g * e**2 -1440 * f**2 * e)) * c**2 + ((-3402 * g * e + 405 * f**2) * d**2 + 702 * f * e**2 * d- 144 * e**4) * c + (729 * g * d**4 - 243 * f * e * d**3 + 54 * e**3 * d**2))) * a +((-3375 * g**2 * d + (3600 * g * f * e - 1120 * f**3)) * b**3 + (1350 * g**2 * c**2+ (-810 * g * f * d + (-1440 * g * e**2 + 624 * f**2 * e)) * c + ((405 * g * e +216 * f**2) * d**2 - 279 * f * e**2 * d + 54 * e**4)) * b**2 + (36 * g * f * c**3 +((702 * g * e - 279 * f**2) * d + 6 * f * e**2) * c**2 + (-243 * g * d**3 +81 * f * e * d**2 - 18 * e**3 * d) * c) * b + ((-144 * g * e + 54 * f**2) * c**4 +(54 * g * d**2 - 18 * f * e * d + 4 * e**3) * c**3))
         I10 = -46656 * g**5 * a**5 + (38880 * g**4 * f * b + ((62208 * g**4 * e -32400 * g**3 * f**2) * c + (34992 * g**4 * d**2 + (-77760 * g**3 * f * e +27000 * g**2 * f**3) * d + (-13824 * g**3 * e**3 + 43200 * g**2 * f**2 * e**2 -22500 * g * f**4 * e + 3125 * f**6)))) * a**4 + ((-32400 * g**4 * e +540 * g**3 * f**2) * b**2 + ((-77760 * g**4 * d + (31968 * g**3 * f * e -1800 * g**2 * f**3)) * c + (15552 * g**3 * f * d**2 + (46656 * g**3 * e**2 -31320 * g**2 * f**2 * e + 2250 * g * f**4) * d + (-21888 * g**2 * f * e**3 +15600 * g * f**3 * e**2 - 2500 * f**5 * e))) * b + (-13824 * g**4 * c**3 +(46656 * g**3 * f * d + (-17280 * g**3 * e**2 - 6480 * g**2 * f**2 * e +1500 * g * f**4)) * c**2 + ((3888 * g**3 * e - 27540 * g**2 * f**2) * d**2 +(-3456 * g**2 * f * e**2 + 19800 * g * f**3 * e - 3750 * f**5) * d +(9216 * g**2 * e**4 - 10560 * g * f**2 * e**3 + 2000 * f**4 * e**2)) * c +(-8748 * g**3 * d**4 + (21384 * g**2 * f * e - 1350 * g * f**3) * d**3 +(-8640 * g**2 * e**3 - 9720 * g * f**2 * e**2 + 2250 * f**4 * e) * d**2 +(6912 * g * f * e**4 - 1600 * f**3 * e**3) * d + (-1024 * g * e**6 +256 * f**2 * e**5)))) * a**3 + ((27000 * g**4 * d + (-1800 * g**3 * f * e +410 * g**2 * f**3)) * b**3 + (43200 * g**4 * c**2 + (-31320 * g**3 * f * d +(-6480 * g**3 * e**2 + 8748 * g**2 * f**2 * e - 1700 * g * f**4)) * c +((-27540 * g**3 * e + 15417 * g**2 * f**2) * d**2 + (16632 * g**2 * f * e**2 -12330 * g * f**3 * e + 2000 * f**5) * d + (-192 * g**2 * e**4 + 248 * g * f**2 * e**3- 50 * f**4 * e**2))) * b**2 + (-21888 * g**3 * f * c**3 + ((-3456 * g**3 * e +16632 * g**2 * f**2) * d + (15264 * g**2 * f * e**2 - 13040 * g * f**3 * e +2250 * f**5)) * c**2 + (21384 * g**3 * d**3 + (-22896 * g**2 * f * e +1980 * g * f**3) * d**2 + (-5760 * g**2 * e**3 + 10152 * g * f**2 * e**2 -2050 * f**4 * e) * d + (-640 * g * f * e**4 + 160 * f**3 * e**3)) * c +(-6318 * g**2 * f * d**4 + (5832 * g**2 * e**2 + 3942 * g * f**2 * e -900 * f**4) * d**3 + (-4464 * g * f * e**3 + 1020 * f**3 * e**2) * d**2 +(768 * g * e**5 - 192 * f**2 * e**4) * d)) * b + ((9216 * g**3 * e -192 * g**2 * f**2) * c**4 + (-8640 * g**3 * d**2 + (-5760 * g**2 * f * e -120 * g * f**3) * d + (-4352 * g**2 * e**3 + 4816 * g * f**2 * e**2 -900 * f**4 * e)) * c**3 + (5832 * g**2 * f * d**3 + (8208 * g**2 * e**2 -4536 * g * f**2 * e + 825 * f**4) * d**2 + (-2496 * g * f * e**3 +560 * f**3 * e**2) * d + (512 * g * e**5 - 128 * f**2 * e**4)) * c**2 +((-4860 * g**2 * e + 162 * g * f**2) * d**4 + (2808 * g * f * e**2 -630 * f**3 * e) * d**3 + (-576 * g * e**4 + 144 * f**2 * e**3) * d**2) * c +(729 * g**2 * d**6 + (-486 * g * f * e + 108 * f**3) * d**5 + (108 * g * e**3 -27 * f**2 * e**2) * d**4))) * a**2 + ((-22500 * g**4 * c + (2250 * g**3 * f * d +(1500 * g**3 * e**2 - 1700 * g**2 * f**2 * e + 320 * g * f**4))) * b**4 +(15600 * g**3 * f * c**2 + ((19800 * g**3 * e - 12330 * g**2 * f**2) * d +(-13040 * g**2 * f * e**2 + 9768 * g * f**3 * e - 1600 * f**5)) * c +(-1350 * g**3 * d**3 + (1980 * g**2 * f * e - 208 * g * f**3) * d**2 +(-120 * g**2 * e**3 - 682 * g * f**2 * e**2 + 160 * f**4 * e) * d + (144 * g * f * e**4- 36 * f**3 * e**3))) * b**3 + ((-10560 * g**3 * e + 248 * g**2 * f**2) * c**3 +(-9720 * g**3 * d**2 + (10152 * g**2 * f * e - 682 * g * f**3) * d +(4816 * g**2 * e**3 - 5428 * g * f**2 * e**2 + 1020 * f**4 * e)) * c**2 +(3942 * g**2 * f * d**3 + (-4536 * g**2 * e**2 - 2412 * g * f**2 * e +560 * f**4) * d**2 + (3272 * g * f * e**3 - 746 * f**3 * e**2) * d + (-576 * g * e**5+ 144 * f**2 * e**4)) * c + (162 * g**2 * e * d**4 + (-108 * g * f * e**2 +24 * f**3 * e) * d**3 + (24 * g * e**4 - 6 * f**2 * e**3) * d**2)) * b**2 +((6912 * g**3 * d + (-640 * g**2 * f * e + 144 * g * f**3)) * c**4 +(-4464 * g**2 * f * d**2 + (-2496 * g**2 * e**2 + 3272 * g * f**2 * e -630 * f**4) * d + (-96 * g * f * e**3 + 24 * f**3 * e**2)) * c**3 + ((2808 * g**2 * e- 108 * g * f**2) * d**3 + (-1584 * g * f * e**2 + 356 * f**3 * e) * d**2 +(320 * g * e**4 - 80 * f**2 * e**3) * d) * c**2 + (-486 * g**2 * d**5 +(324 * g * f * e - 72 * f**3) * d**4 + (-72 * g * e**3 +18 * f**2 * e**2) * d**3) * c) * b + (-1024 * g**3 * c**6 + (768 * g**2 * f * d +(512 * g**2 * e**2 - 576 * g * f**2 * e + 108 * f**4)) * c**5 + ((-576 * g**2 * e +24 * g * f**2) * d**2 + (320 * g * f * e**2 - 72 * f**3 * e) * d + (-64 * g * e**4 +16 * f**2 * e**3)) * c**4 + (108 * g**2 * d**4 + (-72 * g * f * e + 16 * f**3) * d**3 +(16 * g * e**3 - 4 * f**2 * e**2) * d**2) * c**3)) * a + (3125 * g**4 * b**6 +(-2500 * g**3 * f * c + ((-3750 * g**3 * e + 2000 * g**2 * f**2) * d +(2250 * g**2 * f * e**2 - 1600 * g * f**3 * e + 256 * f**5))) * b**5 +((2000 * g**3 * e - 50 * g**2 * f**2) * c**2 + (2250 * g**3 * d**2 +(-2050 * g**2 * f * e + 160 * g * f**3) * d + (-900 * g**2 * e**3 +1020 * g * f**2 * e**2 - 192 * f**4 * e)) * c + (-900 * g**2 * f * d**3 +(825 * g**2 * e**2 + 560 * g * f**2 * e - 128 * f**4) * d**2 + (-630 * g * f * e**3 +144 * f**3 * e**2) * d + (108 * g * e**5 - 27 * f**2 * e**4))) * b**4 +((-1600 * g**3 * d + (160 * g**2 * f * e - 36 * g * f**3)) * c**3 +(1020 * g**2 * f * d**2 + (560 * g**2 * e**2 - 746 * g * f**2 * e + 144 * f**4) * d +(24 * g * f * e**3 - 6 * f**3 * e**2)) * c**2 + ((-630 * g**2 * e +24 * g * f**2) * d**3 + (356 * g * f * e**2 - 80 * f**3 * e) * d**2 + (-72 * g * e**4 +18 * f**2 * e**3) * d) * c + (108 * g**2 * d**5 + (-72 * g * f * e + 16 * f**3) * d**4+ (16 * g * e**3 - 4 * f**2 * e**2) * d**3)) * b**3 + (256 * g**3 * c**5 +(-192 * g**2 * f * d + (-128 * g**2 * e**2 + 144 * g * f**2 * e - 27 * f**4)) * c**4 +((144 * g**2 * e - 6 * g * f**2) * d**2 + (-80 * g * f * e**2 + 18 * f**3 * e) * d +(16 * g * e**4 - 4 * f**2 * e**3)) * c**3 + (-27 * g**2 * d**4 + (18 * g * f * e -4 * f**3) * d**3 + (-4 * g * e**3 + f**2 * e**2) * d**2) * c**2) * b**2)
         return [I4, I6p, I10, I2 * I10]
+
+    def parametrize_conic(pt, conic, t):
+        x0, y0, z0 = pt
+        c11, c22, c23, c23, c31, c12 = conic
+
+        #Enforce x0 != 0
+        if not g2_curve_safe_is_nonzero(x0):
+            if g2_curve_safe_is_nonzero(y0):
+                y, z, x = g2_curve_parametrize_conic([y0, z0, x0], [c22, c33, c11, c31, c12, c23])
+            elif g2_curve_safe_is_nonzero(z0):
+                z, x, y = g2_curve_parametrize_conic([z0, x0, y0], [c33, c11, c22, c12, c23, c13])
+            else:
+                raise ValueError("Conic point does not have any nonzero coordinates")
+
+        R = PolynomialRing(t.parent(), "u")
+        x = x0
+        y = y0 + u * t
+        z = z0 + u
+        substitution = c11 * x**2 + c22 * y**2 + c33 * z**2 + c23 * y * z + c31 * x * z + c12 * x * y
+        a = substitution.coefficient(2) # in u
+        b = substitution.coefficient(1) # in u
+        return [x0 * a, y0 * a - t * b, z0 * a - b]
+
+    def find_rescaling(R, v1, v2, e, w):
+        r"""
+        Given two vectors v1 and v2, find an element lambda in the ring R such
+        that \prod_i v1_i^{e_i} = lambda^k * \prod_i v2_i^{e_i}, where we set
+        k = \sum_i e_i w_i. We require k > 0.
+
+        EXAMPLES::
+
+            sage:
+
+        TESTS::
+
+            sage:
+
+        """
+        a1 = 1
+        a2 = 1
+        k = 0
+        n = len(v1)
+        if n != len(v2) or n != len(e) or n != len(v):
+            raise ValueError("Input vectors must be of the same length")
+        for i in range(n):
+            a1 *= v1[i] ** e[i]
+            a2 *= v2[i] ** e[i]
+            k += e[i] * wt[i]
+        if k <= 0:
+            raise ValueError("Minimal weight must be positive")
+        x = a1 / a2
+        try:
+            x = R(x**(1/k))
+        except TypeError, ValueError:
+            raise ValueError("Could not extract a {}th root of {} in {}".format(k, x, R))
+        return x
 
     def __init__(self, data, inv_type = "Modular"):
         r"""
@@ -188,19 +244,22 @@ class PPASInvariants(SageObject):
         self.ic = None
         self.clebsch = None
         self.ic_mod = None
-        self.U = None
         self.j_invariants = None
 
+        self.mestre_U = None
         self.mestre_conic = None
         self.mestre_line = None
+
         self.aut_gp = None
+        self.bolza_a2 = None
+        self.min_wt = None
 
         if isinstance(data, CommutativePolynomial):
             F = data.parent().base_ring()
             F = PPASInvariants.field_base_change(F)
             self.base_ring = F
             self.g2_curve = data.base_extend(F)
-            self.ic_mod = Sequence(PPASInvariants.modified_igusa_from_curve_coefficients(self.g2_curve.coefficients(6)),
+            self.ic_mod = Sequence(PPASInvariants.modified_igusa_clebsch_from_curve(self.g2_curve),
                                    universe = F)
             self.modular = Sequence(PPASInvariants.modular_from_modified_igusa(self.ic_mod),
                                    universe = F)
@@ -259,7 +318,7 @@ class PPASInvariants(SageObject):
 
                 R = PolynomialRing(F, "x")
                 self.g2_curve = R(data).reverse(6)
-                self.ic_mod = Sequence(PPASInvariants.modified_igusa_from_curve_coefficients(self.g2_curve.coefficients(6)),
+                self.ic_mod = Sequence(PPASInvariants.modified_igusa_clebsch_from_curve(self.g2_curve),
                                        universe = F)
                 self.modular = Sequence(PPASInvariants.modular_from_modified_igusa(self.ic_mod),
                                         universe = F)
@@ -427,6 +486,35 @@ class PPASInvariants(SageObject):
         return Sequence([m4, m6, m10, m12, Y12, X16, X18, X24, X28, X30, X36, X40, X42, X48],
                         universe = self.base_ring)
 
+    def minimal_weight_combination(self):
+        r"""
+        Returns a list of exponents [a, b, c, d] such that the product
+        I_4^a I_6'^b I_{10}^c I_{12}^d is a nonvanishing monomial in the
+        specified invariants of the smallest possible weight.
+
+        EXAMPLES::
+
+            sage:
+
+        TESTS::
+
+            sage:
+
+        """
+        if not self.min_wt is None:
+            return self.min_wt
+
+        if not self.base_ring().is_exact():
+            raise ValueError("Minimal weight combination is not implemented over inexact base fields")
+        vec = self.modified_igusa_clebsch()
+        weights = [4, 6, 10, 12]
+        for i in range(4):
+            if vec[i] == 0:
+                weights[i] == 0
+        res = xgcd(weights)
+        self.min_wt = list(res[1:len(res)])
+        return self.min_wt
+
     def bolza_condition_19(self):
         r"""
         Returns True iff Bolza's condition 19 holds. If so, additionally return
@@ -509,20 +597,59 @@ class PPASInvariants(SageObject):
         R2 = self.R2_invariant()
         A, B, C, D = self.clebsch_invariants()
         if R2 != 0 and (A != 0 or B != 0 or C != 0):
-            self.aut_gp = AbelianGroup([2])
+            self.aut_gp = Cyclic(2)
         elif R2 != 0:
-            pass
+            self.aut_gp = Cyclic(2).direct_product(Cyclic(5))
         elif B == 0 and C == 0 and D == 0:
-            pass
+            self.aut_gp = Cyclic(2).direct_product(Symmetric(4))
         elif 6 * B - A**2 == 0 and 6 * C - A * B == 0 and D == 0:
-            pass
-        elif self.bolza_condition_19():
-            pass
-        elif self.bolza_condition_23():
-            pass
+            self.aut_gp = Cyclic(2).direct_product(Dihedral(6))
         else:
-            pass
+            r, a2 = self.bolza_condition_19()
+            if r:
+                self.bolza_a2 = a2
+                self.aut_gp = Cyclic(2).direct_product(Dihedral(3))
+            else:
+                r, a2 = self.bolza_condition_23()
+                if r:
+                    self.bolza_a2 = a2
+                    self.aut_gp = Cyclic(2).direct_product(Dihedral(2))
+                else:
+                    self.aut_gp = Cyclic(2).direct_product(Cyclic(2))
+
         return self.aut_gp
+
+    def mestre_U(self):
+        r"""
+        Return an invariant U that has a weight 12 and is nonzero in the
+        context of Mestre's algorithm.
+
+        EXAMPLES::
+
+            sage:
+
+        TESTS::
+
+            sage:
+
+        """
+
+        if self.mestre_U is None:
+            if not self.base_ring().is_exact():
+                raise ValueError("Choosing U in Mestre's algorithm is not implemented over inexact base fields")
+            if self.is_geometrically_split():
+                raise ValueError("Mestre's algorithm is not available for geometrically split surfaces")
+            A, B, C, D = self.clebsch_invariants()
+            I10 = self.igusa_clebsch_invariants()[3]
+            if A != 0:
+                self.mestre_U = A**6
+            elif B != 0:
+                self.mestre_U = B**3
+            elif C != 0:
+                self.mestre_U = C**2
+            else:
+                raise ValueError("Could not find nonzero invariant of weight 12")
+        return self.mestre_U
 
     def mestre_conic_coefficients(self):
         r"""
@@ -539,24 +666,10 @@ class PPASInvariants(SageObject):
             sage:
 
         """
-        if not self.conic is None:
-            return self.conic
+        if not self.mestre_conic is None:
+            return self.mestre_conic
 
-        if not self.base_ring().is_exact():
-            raise ValueError("Mestre conic not implemented over inexact base fields")
-        if self.is_geometrically_split():
-            raise ValueError("Mestre conic not available for geometrically split surfaces")
-        A, B, C, D = self.clebsch_invariants()
-        I10 = self.igusa_clebsch_invariants()[3]
-        if A != 0:
-            self.U = A**6
-        elif B != 0:
-            self.U = B**3
-        elif C != 0:
-            self.U = C**2
-        else:
-            raise ValueError("Could not find nonzero invariant of weight 12")
-        U = self.U
+        U = self.mestre_U()
         c11 = 2 * C + A * B/3
         c22 = D
         c33 = B * D/2 + 2 * C * (B**2 + A * C)/9
@@ -666,29 +779,78 @@ class PPASInvariants(SageObject):
             return [x, y, z]
 
     def genus_2_curve_equation(self):
-        if self.g2_curve is None:
-            if self.is_geometrically_split():
-                raise ValueError("The given PPAS is geometrically split")
+        if not self.g2_curve is None:
+            return self.g2_curve
 
-            # Compute parametrization of Mestre's conic
-            x0, y0, z0 = self.mestre_conic_point()
-            c11, c22, c23, c23, c31, c12 = self.mestre_conic_coefficients()
-            
-            U = self.U
+        if self.is_geometrically_split():
+            raise ValueError("The given PPAS is geometrically split")
+
+        R.<t> = PolynomialRing(self.base_ring(), "x")
+        n = self.abstract_automorphism_group().order()
+
+        if n == 2:
+            # Mestre's algorithm
+            x, y, z = PPASInvariants.parametrize_conic(self.mestre_conic_point(),
+                                                       self.mestre_conic_coefficients(), t)
+            U = self.mestre_U()
             I10 = self.igusa_clebsch_invariants()[3]
-    A, B, C, D = ABCD
-    c111 = 8 * (A**2 * C - 6 * B * C + 9 * D)/36
-    c112 = 4 * (2 * B**3 + 4 * A * B * C + 12 * C**2 + 3 * A * D)/36
-    c113 = 4 * (A * B**3 + 4 * A**2 * B * C/3 + 4 * B**2 * C + 6 * A * C**2 + 3 * B * D)/36
-    c122 = 4 * (A * B**3 + 4 * A**2 * B * C/3 + 4 * B**2 * C + 6 * A * C**2 + 3 * B * D)/36
-    c123 = 2 * (2 * B**4 + 4 * A * B**2 * C + 4 * A**2 * C**2/3 + 4 * B * C**2 + 3 * A * B * D + 12 * C * D)/36
-    c133 = 2 * (A * B**4 + 4 * A**2 * B**2 * C/3 + 16 * B**3 * C/3 + 26 * A * B * C**2/3 +  8 * C**3 + 3 * B**2 * D + 2 * A * C * D)/36
-    c222 = 4 * (3 * B**4 + 6 * A * B**2 * C + 8 * A**2 * C**2/3 + 2 * B * C**2 - 3 * C * D)/36
-    c223 = 2 * (-2 * B**3 * C/3 - 4 * A * B * C**2/3 - 4 * C**3 + 9 * B**2 * D + 8 * A * C * D)/36
-    c233 = 2 * (B**5 + 2 * A * B**3 * C + 8 * A**2 * B * C**2/9 + 2 * B**2 * C**2/3  - B * C * D + 9 * D**2)/36
-    c333 = 1 * (-2 * B**4 * C - 4 * A * B**2 * C**2 - 16 * A**2 * C**3/9 - 4 * B * C**3/3  + 9 * B**3 * D + 12 * A * B * C * D + 20 * C**2 * D)/36
-            
-            self.g2_curve = g2_curve_from_igusa_clebsch(self.igusa_clebsch_invariants())
+            A, B, C, D = self.clebsch_invariants()
+            c111 = 8 * (A**2 * C - 6 * B * C + 9 * D)/36
+            c112 = 4 * (2 * B**3 + 4 * A * B * C + 12 * C**2 + 3 * A * D)/36
+            c113 = 4 * (A * B**3 + 4 * A**2 * B * C/3 + 4 * B**2 * C + 6 * A * C**2 + 3 * B * D)/36
+            c122 = 4 * (A * B**3 + 4 * A**2 * B * C/3 + 4 * B**2 * C + 6 * A * C**2 + 3 * B * D)/36
+            c123 = 2 * (2 * B**4 + 4 * A * B**2 * C + 4 * A**2 * C**2/3 + 4 * B * C**2 + 3 * A * B * D + 12 * C * D)/36
+            c133 = 2 * (A * B**4 + 4 * A**2 * B**2 * C/3 + 16 * B**3 * C/3 + 26 * A * B * C**2/3 +  8 * C**3 + 3 * B**2 * D + 2 * A * C * D)/36
+            c222 = 4 * (3 * B**4 + 6 * A * B**2 * C + 8 * A**2 * C**2/3 + 2 * B * C**2 - 3 * C * D)/36
+            c223 = 2 * (-2 * B**3 * C/3 - 4 * A * B * C**2/3 - 4 * C**3 + 9 * B**2 * D + 8 * A * C * D)/36
+            c233 = 2 * (B**5 + 2 * A * B**3 * C + 8 * A**2 * B * C**2/9 + 2 * B**2 * C**2/3  - B * C * D + 9 * D**2)/36
+            c333 = 1 * (-2 * B**4 * C - 4 * A * B**2 * C**2 - 16 * A**2 * C**3/9 - 4 * B * C**3/3  + 9 * B**3 * D + 12 * A * B * C * D + 20 * C**2 * D)/36
+
+            t111 = c111 * U**3 * I10**12 * x**3
+            t112 = 3 * c112 * U**2 * I10**13 * x**2 * y
+            t113 = 3 * c113 * U**6 * I10**8 * x**2 * z
+            t122 = 3 * c122 * U * I10**14 * x * y**2
+            t123 = 6 * c123 * U**5 * I10**9 * x * y * z
+            t133 = 3 * c133 * U**9 * I10**4 * x * z**2
+            t222 = c222 * I10**15 * y**3
+            t223 = 3 * c223 * U**4 * I10**10 * y**2 * z
+            t233 = 3 * c233 * U**8 * I10**5 * y * z**2
+            t333 = c333 * U**12 * z**3
+            self.g2_curve =  t111 + t112 + t113 + t122 + t123 + t133 + t222 + t223 + t233 + t333
+
+        elif n == 4:
+            # Cardona's algorithm
+
+        elif n == 8:
+            try:
+                a = self.base_ring()(self.bolza_a2)
+            except ValueError, TypeError:
+                raise ValueError("Could not extract a square root of {} in {}".format(self.bolza_a2, self.base_ring))
+            self.g2_curve =  t**5 + a * t**3 + t
+
+        elif n == 10:
+            self.g2_curve = t**6 + t
+
+        elif n == 12:
+            try:
+                a = self.base_ring()(self.bolza_a2)
+            except ValueError, TypeError:
+                raise ValueError("Could not extract a square root of {} in {}".format(self.bolza_a2, self.base_ring))
+            self.g2_curve =  t**6 + a * t**3 + 1
+
+        elif n == 24:
+            self.g2_curve = t**6 + 1
+
+        else:
+            assert n == 48, "Unknown automorphism group order: {}".format(n)
+            self.g2_curve = t**5 + t
+
+        # Adjust genus 2 curve equation to achieve the given invariants
+        new_IC = PPASInvariants.modified_igusa_clebsch_from_curve(self.g2_curve)
+        alpha = PPASInvariants.find_rescaling(self.base_ring(), new_IC, self.igusa_clebsch_invariants(),
+                                              self.minimal_weight_combination(), [2, 4, 6, 10])
+        self.g2_curve = self.g2_curve.subs(t / alpha)
+
         return self.g2_curve
 
     def elliptic_curves(self):
