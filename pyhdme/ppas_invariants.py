@@ -64,7 +64,7 @@ class PPASInvariants(SageObject):
 
     """
 
-    def field_base_change(F):
+    def ambient_field(F):
         r"""
         Return a minimal base field F' that contains the ring F, and raises
         a :class:`ValueError` if F' has characteristic 2, 3, or 5.
@@ -247,16 +247,14 @@ class PPASInvariants(SageObject):
         self.j_invariants = None
 
         self.mestre_U = None
-        self.mestre_conic = None
         self.mestre_line = None
-
         self.aut_gp = None
         self.bolza_a2 = None
         self.min_wt = None
 
         if isinstance(data, CommutativePolynomial):
             F = data.parent().base_ring()
-            F = PPASInvariants.field_base_change(F)
+            F = PPASInvariants.ambient_field(F)
             self.base_ring = F
             self.g2_curve = data.base_extend(F)
             self.ic_mod = Sequence(PPASInvariants.modified_igusa_clebsch_from_curve(self.g2_curve),
@@ -272,7 +270,7 @@ class PPASInvariants(SageObject):
                 if not (isinstance(E1, EllipticCurve_generic) and isinstance(E2, EllipticCurve_generic)):
                     raise TypeError("Input must be a pair of elliptic curves")
                 F = Sequence(E1.a_invariants() + E2.a_invariants()).universe()
-                F = PPASInvariants.field_base_change(F)
+                F = PPASInvariants.ambient_field(F)
                 self.base_ring = F
                 self.elliptic_curves = [E1.change_ring(F), E2.change_ring(F)]
                 c41, c61 = E1.c_invariants()
@@ -283,7 +281,7 @@ class PPASInvariants(SageObject):
 
             elif len(data) == 3:
                 F = Sequence(data).universe()
-                F = PPASInvariants.field_base_change(F)
+                F = PPASInvariants.ambient_field(F)
                 self.base_ring = F
                 self.ic_mod = Sequence([data[2], data[0] * data[2], data[2]**2, data[1] * data[2]**2], universe = F)
                 self.modular = Sequence(PPASInvariants.modular_from_modified_igusa(self.ic_mod),
@@ -291,7 +289,7 @@ class PPASInvariants(SageObject):
 
             elif len(data) == 4:
                 F = Sequence(data).universe()
-                F = PPASInvariants.field_base_change(F)
+                F = PPASInvariants.ambient_field(F)
                 self.base_ring = F
                 data = Sequence(data, universe = F)
 
@@ -313,7 +311,7 @@ class PPASInvariants(SageObject):
 
             elif len(data) == 7:
                 F = Sequence(data).universe()
-                F = PPASInvariants.field_base_change(F)
+                F = PPASInvariants.ambient_field(F)
                 self.base_ring = F
 
                 R = PolynomialRing(F, "x")
@@ -651,6 +649,7 @@ class PPASInvariants(SageObject):
                 raise ValueError("Could not find nonzero invariant of weight 12")
         return self.mestre_U
 
+    @cached
     def mestre_conic_coefficients(self):
         r"""
         Return Mestre's conic attached to the specified set of invariants as a
@@ -666,8 +665,6 @@ class PPASInvariants(SageObject):
             sage:
 
         """
-        if not self.mestre_conic is None:
-            return self.mestre_conic
 
         U = self.mestre_U()
         c11 = 2 * C + A * B/3
@@ -683,8 +680,7 @@ class PPASInvariants(SageObject):
         t23 = U**4 * I10**5 * c23
         t31 = U**5 * I10**4 * c31
         t12 = U * I10**9 * c12
-        self.mestre_conic = Sequence([t11, t22, t33, t23, t31, t12], universe = self.base_ring())
-        return self.mestre_conic
+        return Sequence([t11, t22, t33, t23, t31, t12], universe = self.base_ring())
 
     @cached
     def mestre_conic(self):
@@ -757,6 +753,7 @@ class PPASInvariants(SageObject):
             sage:
 
         """
+
         try:
             return self.mestre_conic().rational_point()
         except NotImplementedError:
@@ -779,6 +776,24 @@ class PPASInvariants(SageObject):
             return [x, y, z]
 
     def genus_2_curve_equation(self):
+        r"""
+        Return a genus 2 curve equation over the base ring of self which
+        realizes the specified invariants, raising a :class:`ValueError` if no
+        such curve exists. Over inexact rings, a :class:`ValueError` is raised
+        unless the invariants are the base change of invariants over an exact
+        rings where some precomputations (e.g. the automorphism group) have
+        been performed.
+
+        EXAMPLES::
+
+            sage:
+
+        TESTS::
+
+            sage:
+
+        """
+
         if not self.g2_curve is None:
             return self.g2_curve
 
@@ -820,6 +835,31 @@ class PPASInvariants(SageObject):
 
         elif n == 4:
             # Cardona's algorithm
+            # Coefficients of conic
+            A11 = 1/3*A*B + 2*C
+            A12 = 2/3*B^2 + 2/3*A*C
+            A22 = D
+            A33 = -2/9*B^4 - 4/9*A*B^2*C - 2/9*A^2*C^2 + 1/6*A*B*D + C*D
+            # Conic parametrization
+            x = -2 * A22 * t - 2 * A12
+            y = -A22 * t**2 + A11
+            z = A22 * t**2 + 2 * A12 * t + A11
+            # Substitute in cubic
+
+            a111 = 4/675*A^2*C - 8/225*B*C + 4/75*D
+            a112 = 4/675*B^3 + 8/675*A*B*C + 8/225*C^2 + 2/225*A*D
+            a122 = 2/675*A*B^3 + 8/2025*A^2*B*C + 8/675*B^2*C + 4/225*A*C^2 + 2/225*B*D
+            a133 = -1/2025*A^2*B^4 - 4/6075*A^3*B^2*C + 8/2025*B^5 + 14/2025*A*B^3*C + 2/2025*A^2*B*C^2 + 8/675*B^2*C^2 + 4/675*A*C^3 + 1/225*A*B^2*D + 2/675*A^2*C*D + 2/225*B*C*D - 2/75*D^2
+            a222 = 2/225*B^4 + 4/225*A*B^2*C + 16/2025*A^2*C^2 + 4/675*B*C^2 - 2/225*C*D
+            a233 = 1/2025*A*B^5 + 2/1215*A^2*B^3*C + 8/6075*A^3*B*C^2 - 2/2025*B^4*C + 2/2025*A*B^2*C^2 + 8/2025*A^2*C^3 - 4/675*B*C^3 + 2/675*B^3*D + 1/675*A*B*C*D - 2/225*C^2*D - 1/225*A*D^2
+
+            t111 = -A33 * a111 * x**3
+            t112 = -3 * A33 * a112 * x**2 * y
+            t122 = -3 * A33 * a122 * x * y**2
+            t133 = 3 * A22 * a133 * x * z**2
+            t222 = -A33 * a222 * y**3
+            t333 = 3 * A22 * a233 * x * z**2
+            self.g2_curve = t111 + t112 + t122 + t133 + t222 + t333
 
         elif n == 8:
             try:
@@ -847,15 +887,118 @@ class PPASInvariants(SageObject):
 
         # Adjust genus 2 curve equation to achieve the given invariants
         new_IC = PPASInvariants.modified_igusa_clebsch_from_curve(self.g2_curve)
-        alpha = PPASInvariants.find_rescaling(self.base_ring(), new_IC, self.igusa_clebsch_invariants(),
-                                              self.minimal_weight_combination(), [2, 4, 6, 10])
+        alpha = PPASInvariants.find_rescaling(self.base_ring(), new_IC, self.modified_igusa_clebsch_invariants(),
+                                              self.minimal_weight_combination(), [4, 6, 10, 12])
         self.g2_curve = self.g2_curve.subs(t / alpha)
 
         return self.g2_curve
 
+    def j_invariants_quadratic_equation(self):
+        r"""
+        Return a quadratic equation over the base field of self whose solutions
+        are the j-invariants of the two elliptic factors of the specified PPAS.
+
+        EXAMPLES::
+
+            sage:
+
+        TESTS::
+
+            sage:
+
+        """
+        if not self.is_geometrically_split():
+            raise ValueError("The given PPAS is not geometrically split")
+
+        I4, I6p, I10, I12 = self.modular_invariants()
+        cross_product = I4**3 + I6**2 - I12
+        R.<t> = PolynomialRing(self.base_ring(), "t")
+        return I12 * t**2 + (2 * I4**3 - cross_product) * t + I4**3
+
     def elliptic_curves(self):
+        r"""
+        Return the two elliptic factors of the PPAS with the specified
+        invariants. We require that they are defined over the base field.
+
+        EXAMPLES::
+
+            sage:
+
+        TESTS::
+
+            sage:
+
+        """
+
         if self.elliptic_curves is None:
-            if not self.is_geometrically_split():
-                raise ValueError("The given PPAS is not geometrically split")
-            pass
+            L = self.j_invariants_quadratic_equation().roots(multiplicities = False)
+            if len(L) == 0:
+                raise ValueError("Elliptic factors are not defined over the base field")
+            elif len(L) == 1:
+                E2 = EllipticCurve(L[0])
+            else:
+                E2 = EllipticCurve(L[1])
+            E1 = EllipticCurve(L[0])
+            c41, c61 = E1.c_invariants()
+            c42, c62 = E2.c_invariants()
+            delta1 = E1.discriminant()
+            delta2 = E2.discriminant()
+            new_invs = [c41 * c42, c61 * c62, 0, delta1 * delta2]
+            u = PPASInvariants.find_rescaling(self.base_ring(), new_invs, self.modular_invariants(),
+                                              self.minimal_weight_combination(), [4, 6, 10, 12])
+            a1, a2, a3, a4, a6 = E1.a_invariants()
+            E1 = EllipticCurve([a1 / u, a2 / u**2, a3 / u**3, a4 / u**4, a6 / u**6])
+            self.elliptic_curves = [E1, E2]
+
         return self.elliptic_curves
+
+    def change_ring(self, R, force_exact_computations = False):
+        r"""
+        Return an object of the PPASInvariants class with the same invariants
+        over the ring R. If `force_exact_computations` is set to True, then all
+        computations that cannot be performed over an inexact ring are
+        performed before the base change.
+
+        EXAMPLES::
+
+            sage:
+
+        TESTS::
+
+            sage:
+
+        """
+
+        if force_exact_computations:
+            if not self.is_geometrically_split():
+                self.automorphism_group()
+                self.mestre_U()
+                self.mestre_line()
+                self.minimal_weight_combination()
+            else:
+                pass
+
+        res = PPASInvariants(Sequence(self.modular_invariants(), universe = R))
+        if not self.g2_curve is None:
+            res.g2_curve = self.g2_curve.change_ring(R)
+        if not self.elliptic_curves is None:
+            res.elliptic_curves = [E.base_extend(R) for E in self.elliptic_curves]
+        if not self.ic is None:
+            res.ic = Sequence(self.ic, universe = R)
+        if not self.clebsch is None:
+            res.clebsch = Sequence(self.clebsch, universe = R)
+        if not self.ic_mod is None:
+            res.ic_mod = Sequence(self.ic_mod, universe = R)
+        if not self.j_invariants is None:
+            res.j_invariants = Sequence(self.j_invariants, universe = R)
+        if not self.mestre_U is None:
+            res.mestre_U = R(self.mestre_U)
+        if not self.bolza_a2 is None:
+            res.bolza_a2 = R(self.bolza_a2)
+        if not self.mestre_line is None:
+            res.mestre_line = list(self.mestre_line)
+        if not self.aut_gp is None:
+            res.aut_gp = self.aut_gp
+        if not self.min_wt is None:
+            res.min_wt = list(self.min_wt)
+        return res
