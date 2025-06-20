@@ -44,7 +44,7 @@ def g2_curve_bolza_conditions_19(ABCD):
     t3 = -15 * ABCD[2] + 2 * ABCD[0] * ABCD[1]
     r = (t1 == 0) and (t2 == 0)
     if r:
-        if (ABCD[3] == 0 || t3 == 0):
+        if (ABCD[3] == 0 or t3 == 0):
             raise ValueError("Unexpected vanishing")
         a = 10 * g2_curve_safe_sqrt(-t4/t3)
     else:
@@ -58,7 +58,7 @@ def g2_curve_bolza_conditions_23(ABCD):
     t3 = 6 * C**2 - B**3
     r = (t1 == 0) and (t2 == 0)
     if r:
-        if (D == 0 || t3 == 0):
+        if (D == 0 or t3 == 0):
             raise ValueError("Unexpected vanishing")
         a = (B**2 + A * C) / (2 * A**2 * B - 3 * A * C - 15 * B**2)
         a = 10 * g2_curve_safe_sqrt(a)
@@ -230,7 +230,7 @@ def g2_curve_from_igusa_clebsch(IC, base_ring=None, var_name="x"):
     if base_ring is None:
         base_ring = input_base_ring
     poly_ring = PolynomialRing(base_ring, var_name)
-    x = poly_ring.0
+    x = poly_ring.gen()
 
     if (g2_curve_has_generic_automorphisms(IC)):
         return g2_curve_from_igusa_clebsch_mestre(IC, x)

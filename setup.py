@@ -67,7 +67,7 @@ pyhdme = Extension(
         "pyhdme/hdme.pyx",
     ]
     + hdme_sources,
-    libraries=["arb", "flint", "mpfr", "gmp", "pthread", "m"] + libopenmp,
+    libraries=["flint", "mpfr", "gmp", "pthread", "m"] + libopenmp,
     include_dirs=sage_include_directories() + ["pyhdme/lib/"],
     extra_compile_args=["-Wno-sign-compare"] + openmpflags,
     extra_link_args=openmpflags,
