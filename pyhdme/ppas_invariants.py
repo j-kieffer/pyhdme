@@ -44,7 +44,7 @@ class PPASInvariants(SageObject):
 
     7. The coefficients a6, ..., a0 of such a polynomial f = a6 x^6 + ... + a0.
 
-    8. A pair of equations of elliptic curves.
+    8. A pair of elliptic curves.
 
     An element of the PPASInvariants class may be initialized using any of
     these types of invariants, and supports various conversions. A
