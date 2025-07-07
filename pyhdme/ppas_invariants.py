@@ -18,7 +18,7 @@ from sage.structure.sequence import Sequence
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 from sage.rings.polynomial.polynomial_element import Polynomial
 from sage.schemes.plane_conics.constructor import Conic
-from sage.schemes.elliptic_curves.constructor import EllipticCurve
+from sage.schemes.elliptic_curves.constructor import EllipticCurve, EllipticCurve_from_j
 from sage.schemes.elliptic_curves.ell_generic import EllipticCurve_generic
 
 class PPASInvariants(SageObject):
@@ -268,7 +268,7 @@ class PPASInvariants(SageObject):
             sage: PPASInvariants([1, 0, 2, 0, -1, 0, 7]).modular_invariants()
             [22273, -2171249, 22453767/64, 2312738001/32]
             sage: PPASInvariants([EllipticCurve([1, 2]), EllipticCurve([3, 4])]).modular_invariants()
-            [6912, 5971968, 0, 15482880]
+            [6912, 5971968, 0, 185794560]
             sage: PPASInvariants([1, 2, 3]).modular_invariants()
             [3/4, 3/4, -9/4096, 9/16384]
             sage: PPASInvariants([1, 2, 3, 4]).modular_invariants()
@@ -319,7 +319,7 @@ class PPASInvariants(SageObject):
                 c42, c62 = E2.c_invariants()
                 delta1 = E1.discriminant()
                 delta2 = E2.discriminant()
-                self.__modular = Sequence([c41 * c42, c61 * c62, 0, delta1 * delta2], universe = F)
+                self.__modular = Sequence([c41 * c42, c61 * c62, 0, 12 * delta1 * delta2], universe = F)
 
             elif len(data) == 3:
                 F = Sequence(data).universe()
@@ -854,6 +854,7 @@ class PPASInvariants(SageObject):
             True
             sage: X = PPASInvariants([1, 2, 3, 4]).change_ring(ComplexBallField(200), force_exact_computations = True)
             sage: X.mestre_conic_point()[2] == 1
+            True
 
         """
 
@@ -1015,11 +1016,12 @@ class PPASInvariants(SageObject):
         if not self.is_geometrically_split():
             raise ValueError("The given PPAS is not geometrically split")
 
-        I4, I6p, I10, I12 = self.modular_invariants()
-        cross_product = I4**3 + I6p**2 - I12
+        X4, X6, X10, X12 = self.modular_invariants()
+        j1j2 = 12 * X4**3 / X12
+        j1pj2 = (12 / X12) * ((X4**3 - X6**2 + 12**5 * X12) / 1728)
         R = PolynomialRing(self.base_ring(), "t")
         t = R.gen()
-        return (I12 * t**2 + (2 * I4**3 - cross_product) * t + I4**3) / I12
+        return t**2 - j1pj2 * t + j1j2
 
     def elliptic_curves(self):
         r"""
@@ -1033,6 +1035,8 @@ class PPASInvariants(SageObject):
             sage: E1, E2 = PPASInvariants(vec).elliptic_curves()
             sage: {E1.j_invariant(), E2.j_invariant()} == {432/7, 1728/5}
             True
+            sage: PPASInvariants([E1, E2]).modular_invariants() == vec
+            True
 
         """
 
@@ -1041,19 +1045,19 @@ class PPASInvariants(SageObject):
             if len(L) == 0:
                 raise ValueError("Elliptic factors are not defined over the base field")
             elif len(L) == 1:
-                E2 = EllipticCurve(L[0])
+                E2 = EllipticCurve_from_j(L[0])
             else:
-                E2 = EllipticCurve(L[1])
-            E1 = EllipticCurve(L[0])
+                E2 = EllipticCurve_from_j(L[1])
+            E1 = EllipticCurve_from_j(L[0])
             c41, c61 = E1.c_invariants()
             c42, c62 = E2.c_invariants()
             delta1 = E1.discriminant()
             delta2 = E2.discriminant()
-            new_invs = [c41 * c42, c61 * c62, 0, delta1 * delta2]
+            new_invs = [c41 * c42, c61 * c62, 0, (delta1 * delta2) / 12]
             u = PPASInvariants.find_rescaling(self.base_ring(), new_invs, self.modular_invariants(),
-                                              self.minimal_weight_combination(), [4, 6, 10, 12])
-            a1, a2, a3, a4, a6 = E1.a_invariants()
-            E1 = EllipticCurve([a1 / u, a2 / u**2, a3 / u**3, a4 / u**4, a6 / u**6])
+                                              self.minimal_weight_combination(), [2, 3, 5, 6])
+            _ , _, _, a4, a6 = E1.a_invariants()
+            E1 = EllipticCurve([0, 0, 0, a4 / u**2, a6 / u**3])
             self.__ell_curves = [E1, E2]
 
         return self.__ell_curves
