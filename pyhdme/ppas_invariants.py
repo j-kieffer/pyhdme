@@ -19,7 +19,7 @@ from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 from sage.rings.polynomial.polynomial_element import Polynomial
 from sage.schemes.plane_conics.constructor import Conic
 from sage.schemes.elliptic_curves.constructor import EllipticCurve
-from sage.groups.finitely_presented_named import CyclicPresentation, DihedralPresentation, SymmetricPresentation
+from sage.schemes.elliptic_curves.ell_generic import EllipticCurve_generic
 
 class PPASInvariants(SageObject):
     r"""
@@ -30,48 +30,39 @@ class PPASInvariants(SageObject):
 
     The different sets of invariants are as follows:
 
-    1. The "modular invariants", which correspond to the following Siegel
-    modular forms with integral Fourier expansions:
+    - The "modular invariants", which correspond to the following Siegel
+      modular forms with integral Fourier expansions:
 
-    psi4 = 1 + 240(q1+q2) + ...
-    psi6 = 1 - 504(q1+q1) + ...
-    chi10 = (q3 - 2 + q3^-1) + ...
-    chi12 = (q3 + 10 + q3^-1) + ...
+      \psi_4 = 1 + 240 * (q_1 + q_2) + ...
 
-    These invariants make sense both for Jacobians of genus 2 curves and for
-    products of elliptic curves.
+      \psi_6 = 1 - 504 * (q_1 + q_2) + ...
 
-    2. The classical Igusa--Clebsch invariants I_2, I_4, I_6, I_{10}.
+      \chi_{10} = (q_3 - 2 + q_3^{-1}) + ...
 
-    3. The classical Clebsch invariants A, B, C, D.
+      \chi_{12} = (q_3 + 10 + q_3^{-1}) + ...
 
-    4. The modified Igusa--Clebsch invariants I_4, I_6', I_{10}, I_{12}.
+      These invariants make sense both for Jacobians of genus 2 curves and for
+      products of elliptic curves.
 
-    5. The absolute Igusa invariants, defined as follows:
-    j_1 = I_4*I_6'/I_{10}, j_2 = I_4^2*I_{12}/I_{10}^2, j_3 = I_4^5/I_{10}^2.
+    - The classical Igusa--Clebsch invariants I_2, I_4, I_6, I_{10}.
 
-    6. The equation of a genus 2 curve y^2 = f(x), represented as the
-    polynomial f(x) of degree 5 or 6.
+    - The classical Clebsch invariants A, B, C, D.
 
-    7. The coefficients a6, ..., a0 of such a polynomial f = a6 x^6 + ... + a0.
+    - The modified Igusa--Clebsch invariants I_4, I_6', I_{10}, I_{12}.
 
-    8. A pair of elliptic curves.
+    - The absolute Igusa invariants, defined as follows:
 
-    An element of the PPASInvariants class may be initialized using any of
-    these types of invariants, and supports various conversions. A
-    :class:`ValueError` is raised when the conversion doesn't make sense
-    (e.g. when asking for the Igusa invariants of a product of elliptic curves)
+      j_1 = I_4 * I_6' / I_{10},
+
+      j_2 = I_4^2 * I_{12} / I_{10}^2,
+
+      j_3 = I_4^5 / I_{10}^2.
 
     Some properties of principally polarized abelian surfaces that are easily
-    obtained from invariants (automorphism groups) are also available.
-
-    EXAMPLES::
-
-        sage:
-
-    TESTS::
-
-        sage:
+    obtained from invariants (such as automorphism groups) are also available.
+    A :class:`ValueError` is raised when the conversion doesn't make sense
+    (e.g. when asking for the Igusa invariants of a product of elliptic
+    curves).
 
     """
 
@@ -82,11 +73,13 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants.ambient_field(ZZ)
+            Rational Field
+            sage: PPASInvariants.ambient_field(FiniteField(5))
+            Traceback (most recent call last):
+            ...
+            ValueError: Base field cannot have characteristic 2, 3 or 5
 
         """
         if not F.is_field():
@@ -101,11 +94,10 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: vec = PPASInvariants([1, 2, 3, 4], "ModifiedIgusaClebsch").modular_invariants()
+            sage: vec == PPASInvariants.modular_from_modified_igusa([1, 2, 3, 4])
+            True
 
         """
         I4, I6p, I10, I12 = vec
@@ -117,11 +109,10 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: vec = PPASInvariants([1, 2, 3, 4], "IgusaClebsch").modified_igusa_clebsch_invariants()
+            sage: vec == PPASInvariants.modified_igusa_clebsch_from_igusa_clebsch([1, 2, 3, 4])
+            True
 
         """
         I2, I4, I6, I10 = vec
@@ -133,11 +124,10 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: vec = PPASInvariants([1, 2, 3, 4], "Clebsch").igusa_clebsch_invariants()
+            sage: vec == PPASInvariants.igusa_clebsch_from_clebsch([1, 2, 3, 4])
+            True
 
         """
         A, B, C, D = vec
@@ -147,22 +137,22 @@ class PPASInvariants(SageObject):
         I10 = - 62208 * A**5 + 972000 * A**3 * B + 1620000 * A**2 * C - 3037500 * A * B**2 - 6075000 * B * C - 4556250 * D
         return [I2, I4, I6, I10]
 
-    def modified_igusa_clebsch_from_curve(vec):
+    def modified_igusa_clebsch_from_curve(curve):
         r"""
         Return the modified Igusa--Clebsch invariants from the given vector
-        of curve coefficients. Todo: rewrite this in terms of transvectants
-        of binary forms for efficiency.
+        of curve coefficients. This should be rewritten in terms of
+        transvectants of binary forms for efficiency.
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: R.<t> = PolynomialRing(QQ)
+            sage: vec = PPASInvariants(t^6 - 4*t^4 + 7).modified_igusa_clebsch_invariants()
+            sage: vec == PPASInvariants.modified_igusa_clebsch_from_curve(t^6 - 4*t^4 + 7)
+            True
 
         """
-        a, b, c, d, e, f, g = vec
+        a, b, c, d, e, f, g = [curve.coefficient(6 - i) for i in range(7)]
         I2 = -240 * g * a + (40 * f * b + (-16 * e * c + 6 * d**2))
         I4 = 1620 * g**2 * a**2 + (-540 * g * f * b + ((-504 * g * e + 300 * f**2) * c + (324 * g * d**2 - 180 * f * e * d + 48 * e**3))) * a + ((300 * g * e - 80 * f**2) * b**2 + ((-180 * g * d + 4 * f * e) * c + (36 * f * d**2 - 12 * e**2 * d)) * b + (48 * g * c**3 + (-12 * f * d + 4 * e**2) * c**2))
         I6p = -14580 * g**3 * a**3 + (7290 * g**2 * f * b + ((16524 * g**2 * e -8100 * g * f**2) * c + (-18954 * g**2 * d**2 + (17010 * g * f * e - 3375 * f**3) * d+ (-5616 * g * e**3 + 1350 * f**2 * e**2)))) * a**2 + ((-8100 * g**2 * e +2160 * g * f**2) * b**2 + ((17010 * g**2 * d + (-11448 * g * f * e +3600 * f**3)) * c + (-2187 * g * f * d**2 + (2754 * g * e**2 - 810 * f**2 * e) * d +36 * f * e**3)) * b + (-5616 * g**2 * c**3 + (2754 * g * f * d + (2916 * g * e**2 -1440 * f**2 * e)) * c**2 + ((-3402 * g * e + 405 * f**2) * d**2 + 702 * f * e**2 * d- 144 * e**4) * c + (729 * g * d**4 - 243 * f * e * d**3 + 54 * e**3 * d**2))) * a +((-3375 * g**2 * d + (3600 * g * f * e - 1120 * f**3)) * b**3 + (1350 * g**2 * c**2+ (-810 * g * f * d + (-1440 * g * e**2 + 624 * f**2 * e)) * c + ((405 * g * e +216 * f**2) * d**2 - 279 * f * e**2 * d + 54 * e**4)) * b**2 + (36 * g * f * c**3 +((702 * g * e - 279 * f**2) * d + 6 * f * e**2) * c**2 + (-243 * g * d**3 +81 * f * e * d**2 - 18 * e**3 * d) * c) * b + ((-144 * g * e + 54 * f**2) * c**4 +(54 * g * d**2 - 18 * f * e * d + 4 * e**3) * c**3))
@@ -170,6 +160,23 @@ class PPASInvariants(SageObject):
         return [I4, I6p, I10, I2 * I10]
 
     def parametrize_conic(pt, conic, t):
+        r"""
+        Return a parametrization of the given conic from the given base point,
+        using t as variable.
+
+        EXAMPLES::
+
+            sage: from pyhdme import PPASInvariants
+            sage: conic = [1, 1, -1, 0, 0, 0]                # x^2 + y^2 - z^2
+            sage: pt = [0, -1, 1]
+            sage: R.<t> = PolynomialRing(QQ)
+            sage: x, y, z = PPASInvariants.parametrize_conic(pt, conic, t)
+            sage: x^2 + y^2 - z^2 == 0
+            True
+            sage: x.degree() > 0
+            True
+
+        """
         x0, y0, z0 = pt
         c11, c22, c33, c23, c31, c12 = conic
 
@@ -178,9 +185,11 @@ class PPASInvariants(SageObject):
             if y0 != 0:
                 y, z, x = PPASInvariants.parametrize_conic([y0, z0, x0],
                                                            [c22, c33, c11, c31, c12, c23], t)
+                return [x, y, z]
             elif z0 != 0:
                 z, x, y = PPASInvariants.parametrize_conic([z0, x0, y0],
                                                            [c33, c11, c22, c12, c23, c13], t)
+                return [x, y, z]
             else:
                 raise ValueError("Conic point does not have any nonzero coordinates")
 
@@ -202,11 +211,13 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: v1 = [0, 1, 1]
+            sage: v2 = [0, -1, 1]
+            sage: e = [0, -1, 1]
+            sage: w = [1, 3, 6]
+            sage: PPASInvariants.find_rescaling(Integers(), v1, v2, e, w) == -1
+            True
 
         """
         a1 = 1
@@ -223,30 +234,51 @@ class PPASInvariants(SageObject):
             raise ValueError("Minimal weight must be positive")
         x = a1 / a2
         try:
-            x = R(x**(1/k))
+            x = x.nth_root(k)
         except (TypeError, ValueError):
             raise ValueError("Could not extract a {}th root of {} in {}".format(k, x, R))
         return x
 
     def __init__(self, data, inv_type = "Modular"):
         r"""
-        Initialize a PPASInvariants data structure.
+        Initialize a PPASInvariants data structure. The input can be one
+        of the following:
 
-        The input data can be either:
-        - a polynomial f of degree 5 or 6 encoding the genus 2 curve y^2 = f(x),
-        - a pair of elliptic curves,
-        - a triple of absolute Igusa invariants,
-        - a tuple of 4 invariants, whose type is specified by inv_type. The
-          possible values are: Modular (default), IgusaClebsch,
-          ModifiedIgusaClebsch, and Clebsch, or
-        - a tuple of 7 coefficients a_6, ..., a_0, encoding the polynomial
-          f = a_6 x^6 + ... + a_0 as in the first item.
+        - A polynomial f of degree 5 or 6 encoding the genus 2 curve y^2 = f(x),
+
+        - A tuple of 7 coefficients a_6, ..., a_0, encoding the polynomial
+          f = a_6 x^6 + ... + a_0 as in the first item,
+
+        - A pair of elliptic curves,
+
+        - A triple of absolute Igusa invariants, or
+
+        - A tuple of 4 invariants, whose type is specified by inv_type. The
+          possible values are: "Modular" (default), "IgusaClebsch",
+          "ModifiedIgusaClebsch", and "Clebsch".
 
         The corresponding modular invariants are then computed.
 
         EXAMPLES::
 
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: R.<x> = PolynomialRing(QQ)
+            sage: PPASInvariants(x^6 + 2*x^4 - x^2 + 7).modular_invariants()
+            [22273, -2171249, 22453767/64, 2312738001/32]
+            sage: PPASInvariants([1, 0, 2, 0, -1, 0, 7]).modular_invariants()
+            [22273, -2171249, 22453767/64, 2312738001/32]
+            sage: PPASInvariants([EllipticCurve([1, 2]), EllipticCurve([3, 4])]).modular_invariants()
+            [6912, 5971968, 0, 15482880]
+            sage: PPASInvariants([1, 2, 3]).modular_invariants()
+            [3/4, 3/4, -9/4096, 9/16384]
+            sage: PPASInvariants([1, 2, 3, 4]).modular_invariants()
+            [1, 2, 3, 4]
+            sage: PPASInvariants([1, 2, 3, 4], "IgusaClebsch").modular_invariants()
+            [1/2, -7/8, -1/1024, 1/8192]
+            sage: PPASInvariants([1, 2, 3, 4], "ModifiedIgusaClebsch").modular_invariants()
+            [1/4, 1/2, -3/4096, 1/8192]
+            sage: PPASInvariants([1, 2, 3, 4], "Clebsch").modular_invariants()
+            [3195, -683505/2, 7510401/512, 112656015/512]
 
         """
 
@@ -260,7 +292,7 @@ class PPASInvariants(SageObject):
 
         self.__mestre_U = None
         self.__mestre_line = None
-        self.__aut_gp = None
+        self.__aut_gp_order = None
         self.__bolza_a2 = None
         self.__min_wt = None
 
@@ -312,7 +344,7 @@ class PPASInvariants(SageObject):
                                     universe = F)
                 if inv_type in ["Clebsch", "IgusaClebsch", "ModifiedIgusaClebsch"]:
                     self.__ic_mod = data
-                    self.__modular = Sequence(PPASInvariants.modular_from_modified_igusa_clebsch(self.__ic_mod),
+                    self.__modular = Sequence(PPASInvariants.modular_from_modified_igusa(self.__ic_mod),
                                             universe = F)
                 elif inv_type == "Modular":
                     self.__modular = data
@@ -340,6 +372,12 @@ class PPASInvariants(SageObject):
         r"""
         Return a string representation of self.
 
+        EXAMPLES:
+
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([1, 2, 3, 4])
+            Modular invariants of a principally polarized abelian surface with values [1, 2, 3, 4] over Rational Field
+
         """
         return "Modular invariants of a principally polarized abelian surface with values {} over {}".format(self.modular_invariants(), self.base_ring())
 
@@ -348,15 +386,14 @@ class PPASInvariants(SageObject):
 
     def base_ring(self):
         r"""
-        Return the base ring of the principally polarized abelian surface.
+        Return the base ring of the principally polarized abelian surface. This
+        is always a field not of characteristic 2, 3, or 5.
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([1, 2, 3, 4]).base_ring()
+            Rational Field
 
         """
         return self.modular_invariants().universe()
@@ -367,11 +404,9 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([1, 2, 3, 4]).modular_invariants()
+            [1, 2, 3, 4]
 
         """
         return self.__modular
@@ -382,11 +417,10 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: vec = PPASInvariants([1, 2, 3, 4], "ModifiedIgusaClebsch").modular_invariants()
+            sage: PPASInvariants(vec).modified_igusa_clebsch_invariants()
+            [1, 2, 3, 4]
 
         """
         if self.__ic_mod is None:
@@ -400,11 +434,11 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([EllipticCurve([1, 2]), EllipticCurve([3, 4])]).is_geometrically_split()
+            True
+            sage: PPASInvariants([1, 2, 3, 4, 5, 6, 7]).is_geometrically_split()
+            False
 
         """
         return self.modular_invariants()[2] == 0
@@ -415,16 +449,19 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: vec = PPASInvariants([1, 2, 3, 4], "IgusaClebsch").modular_invariants()
+            sage: PPASInvariants(vec).igusa_clebsch_invariants()
+            [1, 2, 3, 4]
+            sage: PPASInvariants([EllipticCurve([1, 2]), EllipticCurve([3, 4])]).igusa_clebsch_invariants()
+            Traceback (most recent call last):
+            ...
+            ValueError: Igusa--Clebsch, Clebsch, or R2 invariants are not defined for geometrically split surfaces
 
         """
         if self.__ic is None:
             if self.is_geometrically_split():
-                raise ValueError("Igusa--Clebsch or Clebsch invariants are not defined for products of elliptic curves")
+                raise ValueError("Igusa--Clebsch, Clebsch, or R2 invariants are not defined for geometrically split surfaces")
             I4, I6p, I10, I12 = self.modified_igusa_clebsch_invariants()
             I2 = I12 / I10
             I6 = (2 * I6p - I2 * I4) / (-3)
@@ -437,19 +474,22 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: vec = PPASInvariants([1, 2, 3, 4], "Clebsch").modular_invariants()
+            sage: PPASInvariants(vec).clebsch_invariants()
+            [1, 2, 3, 4]
+            sage: PPASInvariants([EllipticCurve([1, 2]), EllipticCurve([3, 4])]).clebsch_invariants()
+            Traceback (most recent call last):
+            ...
+            ValueError: Igusa--Clebsch, Clebsch, or R2 invariants are not defined for geometrically split surfaces
 
         """
         if self.__clebsch is None:
             I2, I4, I6, I10 = self.igusa_clebsch_invariants()
             A = -I2 / 120
-            B = (I4 + 720 * I2**2) / 6750
-            C = (I6 - 8640 * I2**3 + 108000 * I2 * I4) / 202500
-            D = (I10 + 62208 * I2**5 - 972000 * I2**3 * I4 - 1620000 * I2**2 * I6 + 3037500 * I2 * I4**2 + 6075000 * I4 * I6) / 4556250
+            B = (I4 + 720 * A**2) / 6750
+            C = (I6 - 8640 * A**3 + 108000 * A * B) / 202500
+            D = (I10 + 62208 * A**5 - 972000 * A**3 * B - 1620000 * A**2 * C + 3037500 * A * B**2 + 6075000 * B * C) / (-4556250)
             self.__clebsch = Sequence([A, B, C, D], universe = self.base_ring())
         return self.__clebsch
 
@@ -460,11 +500,13 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([1, 2, 3, 4]).R2_invariant()
+            -701177130860721779769344/3
+            sage: PPASInvariants([EllipticCurve([1, 2]), EllipticCurve([3, 4])]).R2_invariant()
+            Traceback (most recent call last):
+            ...
+            ValueError: Igusa--Clebsch, Clebsch, or R2 invariants are not defined for geometrically split surfaces
 
         """
         a, b, c, d = self.igusa_clebsch_invariants()
@@ -480,11 +522,10 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: vec = PPASInvariants([1,2,3,4,5,6,7]).igusa_integral_invariants()
+            sage: lcm([x.denominator() for x in vec]).divides(2**32)
+            True
 
         """
         m4, m6, m10, m12 = self.modular_invariants()
@@ -510,11 +551,15 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([1, 2, 3, 4]).minimal_weight_combination()
+            [-1, 1, 0, 0]
+            sage: PPASInvariants([0, 2, 3, 0]).minimal_weight_combination()
+            [0, 2, -1, 0]
+            sage: PPASInvariants([1, 0, 0, 4]).minimal_weight_combination()
+            [1, 0, 0, 0]
+            sage: PPASInvariants([0, 0, 3, 0]).minimal_weight_combination()
+            [0, 0, 1, 0]
 
         """
         if not self.__min_wt is None:
@@ -526,7 +571,7 @@ class PPASInvariants(SageObject):
         weights = [4, 6, 10, 12]
         for i in range(4):
             if vec[i] == 0:
-                weights[i] == 0
+                weights[i] = 0
         res = xgcd(weights)
         self.__min_wt = list(res[1:len(res)])
         return self.__min_wt
@@ -539,11 +584,11 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([1, 0, 0, 5, 0, 0, 1])._bolza_condition_19()
+            (True, 25)
+            sage: PPASInvariants([1, 2, 3, 4, 5, 6, 7])._bolza_condition_19()
+            (False, None)
 
         """
         A, B, C, D = self.clebsch_invariants()
@@ -568,15 +613,15 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([0, 1, 0, 5, 0, 1, 0])._bolza_condition_23()
+            (True, 25)
+            sage: PPASInvariants([1, 2, 3, 4, 5, 6, 7])._bolza_condition_23()
+            (False, None)
 
         """
         A, B, C, D = self.clebsch_invariants()
-        t1 = B**2 * A**3 - 6 * B * C + 4 * C * A**2 - 18 * D
+        t1 = 3 * B**2 * A - 6 * B * C + 4 * C * A**2 - 18 * D
         t2 = 4 * B**3 + 5 * C * B * A + 6 * C**2 - 3 * A * D
         t3 = 6 * C**2 - B**3
         r = (t1 == 0) and (t2 == 0)
@@ -597,34 +642,44 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([1, 0, 0, 7, 0, 0, 1])._bolza_a2()
+            49
+            sage: PPASInvariants([0, 1, 0, 7, 0, 1, 0])._bolza_a2()
+            49
 
         """
-        n = self.abstract_automorphism_group().order()
+        n = self.geometric_automorphism_group_order()
         if n != 8 and n != 12:
             raise ValueError("Automorphism group must have order 8 or 12")
         return self.__bolza_a2
 
-    def abstract_automorphism_group(self):
+    def geometric_automorphism_group_order(self):
         r"""
         Return the geometric automorphism group of the specified principally
         polarized abelian surface as an abstract group.
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([1, 0, 0, 2, 4, 4, 1]).geometric_automorphism_group_order()
+            2
+            sage: PPASInvariants([1, 0, 4, 2, 4, 0, 1]).geometric_automorphism_group_order()
+            4
+            sage: PPASInvariants([0, 8, -12, 4, 4, -4, 1]).geometric_automorphism_group_order()
+            8
+            sage: PPASInvariants([0, 4, 0, 0, 0, 0, 1]).geometric_automorphism_group_order()
+            10
+            sage: PPASInvariants([1, 4, 6, 2, 1, 2, 1]).geometric_automorphism_group_order()
+            12
+            sage: PPASInvariants([4, 0, 0, 0, 0, 0, 1]).geometric_automorphism_group_order()
+            24
+            sage: PPASInvariants([0, 1, 0, 0, 0, -1, 0]).geometric_automorphism_group_order()
+            48
 
         """
-        if not self.__aut_gp is None:
-            return self.__aut_gp
+        if not self.__aut_gp_order is None:
+            return self.__aut_gp_order
 
         if not self.base_ring().is_exact():
             raise NotImplementedError("Automorphism group computation is not currently implemented over inexact fields")
@@ -634,27 +689,27 @@ class PPASInvariants(SageObject):
         R2 = self.R2_invariant()
         A, B, C, D = self.clebsch_invariants()
         if R2 != 0 and (A != 0 or B != 0 or C != 0):
-            self.__aut_gp = CyclicPresentation(2)
+            self.__aut_gp_order = 2
         elif R2 != 0:
-            self.__aut_gp = CyclicPresentation(2).direct_product(CyclicPresentation(5))
+            self.__aut_gp_order = 10
         elif B == 0 and C == 0 and D == 0:
-            self.__aut_gp = CyclicPresentation(2).direct_product(SymmetricPresentation(4))
-        elif 6 * B - A**2 == 0 and 6 * C - A * B == 0 and D == 0:
-            self.__aut_gp = CyclicPresentation(2).direct_product(DihedralPresentation(6))
+            self.__aut_gp_order = 48
+        elif 6 * B - A**2 == 0 and 6 * C + A * B == 0 and D == 0:
+            self.__aut_gp_order = 24
         else:
             r, a2 = self._bolza_condition_19()
             if r:
                 self.__bolza_a2 = a2
-                self.__aut_gp = CyclicPresentation(2).direct_product(DihedralPresentation(3))
+                self.__aut_gp_order = 12
             else:
                 r, a2 = self._bolza_condition_23()
                 if r:
                     self.__bolza_a2 = a2
-                    self.__aut_gp = CyclicPresentation(2).direct_product(DihedralPresentation(2))
+                    self.__aut_gp_order = 8
                 else:
-                    self.__aut_gp = CyclicPresentation(2).direct_product(CyclicPresentation(2))
+                    self.__aut_gp_order = 4
 
-        return self.__aut_gp
+        return self.__aut_gp_order
 
     def mestre_U(self):
         r"""
@@ -663,11 +718,13 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import *
+            sage: PPASInvariants([2, 0, 0, 3], "Clebsch").mestre_U()
+            64
+            sage: PPASInvariants([0, 2, 0, 3], "Clebsch").mestre_U()
+            8
+            sage: PPASInvariants([0, 0, 2, 3], "Clebsch").mestre_U()
+            4
 
         """
 
@@ -697,11 +754,14 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([1, 0, 0, 2, 4, 4, 1]).mestre_conic_coefficients()
+            [1446022284009791083826931266640604492291830927431022792400699392/3814697265625,
+             -1970211101399906245312621236038848096800341137518258503304181972992/9765625,
+             -1177289585804149782440607466997517933116350076082317088/21684043449710088680149056017398834228515625,
+             571346664937527031962957218323250104683758030557896417214464/14551915228366851806640625,
+             -74204847112687359611327031353164678633599822781982548426752/9094947017729282379150390625,
+             31556427879826863871882914882202324198981202188163123257389613056/6103515625]
 
         """
 
@@ -731,14 +791,13 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([1, 0, 0, 2, 4, 4, 1]).mestre_conic().has_rational_point()
+            True
 
         """
-        return Conic(self.mestre_conic_coefficients())
+        c11, c22, c33, c23, c31, c12 = self.mestre_conic_coefficients()
+        return Conic([c11, c12, c31, c22, c23, c33])
 
     def mestre_line(self):
         r"""
@@ -748,11 +807,9 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([1, 0, 0, 2, 4, 4, 1]).mestre_line()
+            [0, 0, 1, 1]
 
         """
         if not self.__mestre_line is None:
@@ -788,11 +845,15 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([1, 2, 3, 4]).mestre_conic_point()
+            Traceback (most recent call last):
+            ...
+            ValueError: Conic Projective Conic Curve over Rational Field defined by -1127185340425608660222428387117732200448/119709242282867431640625*x^2 + 21384619996187726563276447985790183538688/3243658447265625*x*y + 18604695790074695860735557275236828110622031872/87890625*y^2 + 4542162058123705044124891912899616237944832/2529562966116768723234470382810841329046525061130523681640625*x*z + 57169784560897719603935029832877867008/68541393517025351101206669249222613871097564697265625*y*z + 362626537414546173099815883313689565069312/53451919647354024719892387428010582905008876370162744702009549602195193074294365942478179931640625*z^2 has no rational points over Rational Field!
+            sage: PPASInvariants([1, 0, 0, 2, 4, 4, 1]).mestre_conic_point()
+            True
+            sage: X = PPASInvariants([1, 2, 3, 4]).change_ring(ComplexBallField(200), force_exact_computations = True)
+            sage: X.mestre_conic_point()[2] == 1
 
         """
 
@@ -829,11 +890,11 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: vec = PPASInvariants([1, 0, 0, 2, 4, 4, 1]).modular_invariants()
+            sage: crv = PPASInvariants(vec).genus_2_curve_equation()
+            sage: PPASInvariants(crv).modular_invariants() == vec
+            True
 
         """
 
@@ -845,7 +906,7 @@ class PPASInvariants(SageObject):
 
         R = PolynomialRing(self.base_ring(), "x")
         t = R.gen()
-        n = self.abstract_automorphism_group().order()
+        n = self.geometric_automorphism_group_order()
 
         if n == 2:
             # Mestre's algorithm
@@ -944,21 +1005,21 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: eq = PPASInvariants([EllipticCurve([1, 2]), EllipticCurve([3, 4])]).j_invariants_quadratic_equation()
+            sage: t = eq.parent().gen()
+            sage: eq == (t - 432/7) * (t - 1728/5)
+            True
 
         """
         if not self.is_geometrically_split():
             raise ValueError("The given PPAS is not geometrically split")
 
-        I4, I6p, I10, I12 = self.modified_igusa_clebsch_invariants()
-        cross_product = I4**3 + I6**2 - I12
+        I4, I6p, I10, I12 = self.modular_invariants()
+        cross_product = I4**3 + I6p**2 - I12
         R = PolynomialRing(self.base_ring(), "t")
         t = R.gen()
-        return I12 * t**2 + (2 * I4**3 - cross_product) * t + I4**3
+        return (I12 * t**2 + (2 * I4**3 - cross_product) * t + I4**3) / I12
 
     def elliptic_curves(self):
         r"""
@@ -967,11 +1028,11 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: vec = PPASInvariants([EllipticCurve([1, 2]), EllipticCurve([3, 4])]).modular_invariants()
+            sage: E1, E2 = PPASInvariants(vec).elliptic_curves()
+            sage: {E1.j_invariant(), E2.j_invariant()} == {432/7, 1728/5}
+            True
 
         """
 
@@ -1006,26 +1067,31 @@ class PPASInvariants(SageObject):
 
         EXAMPLES::
 
-            sage:
-
-        TESTS::
-
-            sage:
+            sage: from pyhdme import PPASInvariants
+            sage: PPASInvariants([1, 2, 13, 4]).change_ring(FiniteField(13)).is_geometrically_split()
+            True
+            sage: X = PPASInvariants([1, 0, 0, 0, 0, 0, 1/3]).change_ring(ComplexBallField(500), force_exact_computations = True)
+            sage: X.geometric_automorphism_group_order()
+            24
+            sage: X.is_geometrically_split()
+            False
 
         """
 
-        if force_exact_computations:
+        R = PPASInvariants.ambient_field(R)
+        reduction = (self.base_ring().characteristic() == 0) and (R.characteristic() > 0)
+
+        if force_exact_computations and not reduction:
             if not self.is_geometrically_split():
-                self.abstract_automorphism_group()
+                self.geometric_automorphism_group_order()
                 self.mestre_U()
                 self.mestre_line()
                 self.minimal_weight_combination()
             else:
                 pass
 
-        R = PPASInvariants.ambient_field(R)
         res = PPASInvariants(Sequence(self.modular_invariants(), universe = R))
-        if not self.__g2_curve is None:
+        if not self.__g2_curve is None and not reduction:
             res.__g2_curve = self.__g2_curve.change_ring(R)
         if not self.__ell_curves is None:
             res.__ell_curves = [E.base_extend(R) for E in self.__ell_curves]
@@ -1035,14 +1101,14 @@ class PPASInvariants(SageObject):
             res.__clebsch = Sequence(self.__clebsch, universe = R)
         if not self.__ic_mod is None:
             res.__ic_mod = Sequence(self.__ic_mod, universe = R)
-        if not self.__mestre_U is None:
+        if not self.__mestre_U is None and not reduction:
             res.__mestre_U = R(self.__mestre_U)
-        if not self.__bolza_a2 is None:
+        if not self.__bolza_a2 is None and not reduction:
             res.__bolza_a2 = R(self.__bolza_a2)
-        if not self.__mestre_line is None:
+        if not self.__mestre_line is None and not reduction:
             res.__mestre_line = list(self.__mestre_line)
-        if not self.__aut_gp is None:
-            res.__aut_gp = self.__aut_gp
-        if not self.__min_wt is None:
+        if not self.__aut_gp_order is None and not reduction:
+            res.__aut_gp_order = self.__aut_gp_order
+        if not self.__min_wt is None and not reduction:
             res.__min_wt = list(self.__min_wt)
         return res
