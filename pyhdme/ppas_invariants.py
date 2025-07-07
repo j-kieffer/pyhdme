@@ -198,7 +198,7 @@ class PPASInvariants(SageObject):
         x = x0
         y = y0 + u * t
         z = z0 + u
-        substitution = c11 * x**2 + c22 * y**2 + c33 * z**2 + c23 * y * z + c31 * x * z + c12 * x * y
+        substitution = c11 * x**2 + c22 * y**2 + c33 * z**2 + 2 * c23 * y * z + 2 * c31 * x * z + 2 * c12 * x * y
         a = substitution.coefficient(2) # in u
         b = substitution.coefficient(1) # in u
         return [x0 * a, y0 * a - t * b, z0 * a - b]
@@ -797,7 +797,7 @@ class PPASInvariants(SageObject):
 
         """
         c11, c22, c33, c23, c31, c12 = self.mestre_conic_coefficients()
-        return Conic([c11, c12, c31, c22, c23, c33])
+        return Conic([c11, 2 * c12, 2 * c31, c22, 2 * c23, c33])
 
     def mestre_line(self):
         r"""
@@ -829,7 +829,7 @@ class PPASInvariants(SageObject):
             y = a2 * t + b2
             z = a3 * t + b3
             c11, c22, c33, c23, c31, c12 = self.mestre_conic_coefficients()
-            substitution = c11 * x**2 + c22 * y**2 + c33 * z**2 + c23 * y * z + c31 * x * z + c12 * x * y
+            substitution = c11 * x**2 + c22 * y**2 + c33 * z**2 + 2 * c23 * y * z + 2 * c31 * x * z + 2 * c12 * x * y
             c0, c1, c2 = [substitution.coefficient(i) for i in range(3)]
             delta = c1**2 - 4 * c1 * c2
             if delta != 0 and c2 != 0 and c0 != 0:
@@ -846,13 +846,9 @@ class PPASInvariants(SageObject):
         EXAMPLES::
 
             sage: from pyhdme import PPASInvariants
-            sage: PPASInvariants([1, 2, 3, 4]).mestre_conic_point()
-            Traceback (most recent call last):
-            ...
-            ValueError: Conic Projective Conic Curve over Rational Field defined by -1127185340425608660222428387117732200448/119709242282867431640625*x^2 + 21384619996187726563276447985790183538688/3243658447265625*x*y + 18604695790074695860735557275236828110622031872/87890625*y^2 + 4542162058123705044124891912899616237944832/2529562966116768723234470382810841329046525061130523681640625*x*z + 57169784560897719603935029832877867008/68541393517025351101206669249222613871097564697265625*y*z + 362626537414546173099815883313689565069312/53451919647354024719892387428010582905008876370162744702009549602195193074294365942478179931640625*z^2 has no rational points over Rational Field!
             sage: PPASInvariants([1, 0, 0, 2, 4, 4, 1]).mestre_conic_point()
-            True
-            sage: X = PPASInvariants([1, 2, 3, 4]).change_ring(ComplexBallField(200), force_exact_computations = True)
+            (10590924330023639461911/184866011890560532480000000000000000000000 : -27056799375472981648123893/78560660413012603882700800000000000000000000000000 : 1)
+            sage: X = PPASInvariants([1, 2, 3, 7]).change_ring(ComplexBallField(200), force_exact_computations = True)
             sage: X.mestre_conic_point()[2] == 1
             True
 
@@ -868,7 +864,7 @@ class PPASInvariants(SageObject):
             y = a2 * t + b2
             z = a3 * t + b3
             c11, c22, c33, c23, c31, c12 = self.mestre_conic_coefficients()
-            substitution = c11 * x**2 + c22 * y**2 + c33 * z**2 + c23 * y * z + c31 * x * z + c12 * x * y
+            substitution = c11 * x**2 + c22 * y**2 + c33 * z**2 + 2 * c23 * y * z + 2 * c31 * x * z + 2 * c12 * x * y
             c0, c1, c2 = [substitution.coefficient(i) for i in range(3)]
             delta = c1**2 - 4 * c0 * c2
             try:
@@ -895,6 +891,21 @@ class PPASInvariants(SageObject):
             sage: vec = PPASInvariants([1, 0, 0, 2, 4, 4, 1]).modular_invariants()
             sage: crv = PPASInvariants(vec).genus_2_curve_equation()
             sage: PPASInvariants(crv).modular_invariants() == vec
+            True
+
+        TESTS::
+
+            sage: from pyhdme import PPASInvariants
+            sage: def check(coeffs): vec = PPASInvariants(coeffs).modular_invariants(); crv = PPASInvariants(vec).genus_2_curve_equation(); return PPASInvariants(crv).modular_invariants == vec
+            sage: check([0, 8, -12, 4, 4, -4, 1])
+            True
+            sage: check([0, 4, 0, 0, 0, 0, 1])
+            True
+            sage: check([1, 4, 6, 2, 1, 2, 1])
+            True
+            sage: check([4, 0, 0, 0, 0, 0, 1])
+            True
+            sage: check([0, 1, 0, 0, 0, -1, 0])
             True
 
         """
