@@ -12,7 +12,8 @@ AUTHORS:
 
 from sage.misc.cachefunc import cached_method
 from sage.misc.functional import sqrt
-from sage.arith.misc import xgcd
+from sage.arith.misc import gcd, xgcd
+from sage.arith.functions import lcm
 from sage.structure.sage_object import SageObject
 from sage.structure.sequence import Sequence
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
@@ -289,6 +290,7 @@ class PPASInvariants(SageObject):
         self.__ic = None
         self.__clebsch = None
         self.__ic_mod = None
+        self.__abs_igusa = None
 
         self.__mestre_U = None
         self.__mestre_line = None
@@ -324,6 +326,7 @@ class PPASInvariants(SageObject):
             elif len(data) == 3:
                 F = Sequence(data).universe()
                 F = PPASInvariants.ambient_field(F)
+                self.__abs_igusa = Sequence(data, universe = F)
                 self.__ic_mod = Sequence([data[2], data[0] * data[2], data[2]**2,
                                           data[1] * data[2]**2], universe = F)
                 self.__modular = Sequence(PPASInvariants.modular_from_modified_igusa(self.__ic_mod),
@@ -543,6 +546,27 @@ class PPASInvariants(SageObject):
         return Sequence([m4, m6, m10, m12, Y12, X16, X18, X24, X28, X30, X36, X40, X42, X48],
                         universe = self.base_ring())
 
+    def absolute_igusa_invariants(self):
+        r"""
+        Returns the absolute Igusa invariants j1, j2, j3 attached to the given
+        PPASInvariants structure.
+
+        EXAMPLES:
+
+            sage: from pyhdme import PPASInvariants
+            sage: v = PPASInvariants([1, 2, 3]).modular_invariants()
+            sage: PPASInvariants(v).absolute_igusa_invariants()
+            [1, 2, 3]
+
+        """
+        if self.__abs_igusa is None:
+            if self.is_geometrically_split():
+                raise ValueError("Absolute Igusa invariants are not defined for geometrically split surfaces")
+            I4, I6p, I10, I12 = self.modified_igusa_clebsch_invariants()
+            self.__abs_igusa = Sequence([I4 * I6p / I10, I4**2 * I12 / I10**2, I4**5 / I10**2],
+                                        universe = self.base_ring())
+        return self.__abs_igusa
+
     def minimal_weight_combination(self):
         r"""
         Returns a list of exponents [a, b, c, d] such that the product
@@ -750,38 +774,58 @@ class PPASInvariants(SageObject):
         r"""
         Return Mestre's conic attached to the specified set of invariants as a
         set of 6 coefficients t11, t22, t33, t23, t31, t12 encoding the conic
-        equation t11 * x^2 + t12 * x * y + ... + t33 * z^2 = 0.
+        equation t11 * x^2 + 2 * t12 * x * y + ... + t33 * z^2 = 0. Also return
+        the absolute invariants x, y, z used to compute those
+        coefficients. This code is taken from
+        sage.schemes.hyperelliptic_curves.mestre.
 
         EXAMPLES::
 
             sage: from pyhdme import PPASInvariants
             sage: PPASInvariants([1, 0, 0, 2, 4, 4, 1]).mestre_conic_coefficients()
-            [1446022284009791083826931266640604492291830927431022792400699392/3814697265625,
-             -1970211101399906245312621236038848096800341137518258503304181972992/9765625,
-             -1177289585804149782440607466997517933116350076082317088/21684043449710088680149056017398834228515625,
-             571346664937527031962957218323250104683758030557896417214464/14551915228366851806640625,
-             -74204847112687359611327031353164678633599822781982548426752/9094947017729282379150390625,
-             31556427879826863871882914882202324198981202188163123257389613056/6103515625]
+            ([39358/820125,
+              -393120856/44840334375,
+              -1213983787808/2451645281953125,
+              14194881712/18160335421875,
+              -393120856/44840334375,
+              12083852/996451875],
+             [2134/54675, 3674/2460375, -196560428/44840334375])
 
         """
 
-        U = self.mestre_U()
-        A, B, C, D = self.clebsch_invariants()
-        I10 = self.igusa_clebsch_invariants()[3]
-        c11 = 2 * C + A * B/3
-        c22 = D
-        c33 = B * D/2 + 2 * C * (B**2 + A * C)/9
-        c23 = B * (B**2 + A * C)/3 + C * (2 * C + A * B/3)/3
-        c31 = D
-        c12 = 2 * (B**2 + A * C)/3
+        I2, I4, I6, I10 = self.igusa_clebsch_invariants()
+        # Setting x,y,z as in Mestre's algorithm (Using Lauter and Yang's formulas)
+        x = 8*(1 + 20*I4/(I2**2))/225
+        y = 16*(1 + 80*I4/(I2**2) - 600*I6/(I2**3))/3375
+        z = -64*(-10800000*I10/(I2**5) - 9 - 700*I4/(I2**2) + 3600*I6/(I2**3) +
+                 12400*I4**2/(I2**4) - 48000*I4*I6/(I2**5))/253125
+        coeffs = Sequence([x+6*y, 2*z, 6*x**2*y + 2*y**2 + 3*x*z, 9*x**3 + 4*x*y + 6*y**2, 2*z, 6*x**2+2*y],
+                          universe = self.base_ring())
+        # do not perform any reduction whatsoever.
+        # try:
+        #     den = lcm([u.denominator() for u in coeffs])
+        #     coeffs = Sequence([u * den for u in coeffs], universe = self.base_ring())
+        # except (AttributeError, TypeError):
+        #     pass
+        return coeffs, Sequence([x, y, z], universe = self.base_ring())
 
-        t11 = U**2 * I10**8 * c11
-        t22 = I10**10 * c22
-        t33 = U**8 * c33
-        t23 = U**4 * I10**5 * c23
-        t31 = U**5 * I10**4 * c31
-        t12 = U * I10**9 * c12
-        return Sequence([t11, t22, t33, t23, t31, t12], universe = self.base_ring())
+        # U = self.mestre_U()
+        # A, B, C, D = self.clebsch_invariants()
+        # I10 = self.igusa_clebsch_invariants()[3]
+        # c11 = 2 * C + A * B/3
+        # c22 = D
+        # c33 = B * D/2 + 2 * C * (B**2 + A * C)/9
+        # c23 = B * (B**2 + A * C)/3 + C * (2 * C + A * B/3)/3
+        # c31 = D
+        # c12 = 2 * (B**2 + A * C)/3
+
+        # t11 = U**2 * I10**8 * c11
+        # t22 = I10**10 * c22
+        # t33 = U**8 * c33
+        # t23 = U**4 * I10**5 * c23
+        # t31 = U**5 * I10**4 * c31
+        # t12 = U * I10**9 * c12
+        # return Sequence([t11, t22, t33, t23, t31, t12], universe = self.base_ring())
 
     @cached_method
     def mestre_conic(self):
@@ -796,7 +840,7 @@ class PPASInvariants(SageObject):
             True
 
         """
-        c11, c22, c33, c23, c31, c12 = self.mestre_conic_coefficients()
+        c11, c22, c33, c23, c31, c12 = self.mestre_conic_coefficients()[0]
         return Conic([c11, 2 * c12, 2 * c31, c22, 2 * c23, c33])
 
     def mestre_line(self):
@@ -828,7 +872,7 @@ class PPASInvariants(SageObject):
             x = t
             y = a2 * t + b2
             z = a3 * t + b3
-            c11, c22, c33, c23, c31, c12 = self.mestre_conic_coefficients()
+            c11, c22, c33, c23, c31, c12 = self.mestre_conic_coefficients()[0]
             substitution = c11 * x**2 + c22 * y**2 + c33 * z**2 + 2 * c23 * y * z + 2 * c31 * x * z + 2 * c12 * x * y
             c0, c1, c2 = [substitution.coefficient(i) for i in range(3)]
             delta = c1**2 - 4 * c1 * c2
@@ -847,15 +891,16 @@ class PPASInvariants(SageObject):
 
             sage: from pyhdme import PPASInvariants
             sage: PPASInvariants([1, 0, 0, 2, 4, 4, 1]).mestre_conic_point()
-            (10590924330023639461911/184866011890560532480000000000000000000000 : -27056799375472981648123893/78560660413012603882700800000000000000000000000000 : 1)
+            (102878878/211574025 : -247277/1567215 : 1)
             sage: X = PPASInvariants([1, 2, 3, 7]).change_ring(ComplexBallField(200), force_exact_computations = True)
             sage: X.mestre_conic_point()[2] == 1
             True
 
         """
-
+        # do not perform any reduction whatsoever.
         try:
-            return self.mestre_conic().rational_point()
+            pt = self.mestre_conic().rational_point()
+        #     pt.clear_denominators()
         except NotImplementedError:
             a2, a3, b2, b3 = self.mestre_line()
             R = PolynomialRing(self.base_ring(), "t")
@@ -863,7 +908,7 @@ class PPASInvariants(SageObject):
             x = t
             y = a2 * t + b2
             z = a3 * t + b3
-            c11, c22, c33, c23, c31, c12 = self.mestre_conic_coefficients()
+            c11, c22, c33, c23, c31, c12 = self.mestre_conic_coefficients()[0]
             substitution = c11 * x**2 + c22 * y**2 + c33 * z**2 + 2 * c23 * y * z + 2 * c31 * x * z + 2 * c12 * x * y
             c0, c1, c2 = [substitution.coefficient(i) for i in range(3)]
             delta = c1**2 - 4 * c0 * c2
@@ -874,34 +919,46 @@ class PPASInvariants(SageObject):
             x = (- c1 + s) / (2 * c2)
             y = a2 * x + b2
             z = a3 * x + b3
-            return [x, y, z]
+            pt = [x, y, z]
+            # try:
+            #     pt = pt * pt.denominator()  # clear the denominator
+            # except (AttributeError, TypeError):
+            #     pass
+        return pt
 
     def genus_2_curve_equation(self):
-        r"""
+        r"""b
+
         Return a genus 2 curve equation over the base ring of self which
-        realizes the specified invariants, raising a :class:`ValueError` if no
-        such curve exists. Over inexact rings, a :class:`ValueError` is raised
-        unless the invariants are the base change of invariants over an exact
-        rings where some precomputations (e.g. the automorphism group) have
-        been performed.
+        realizes the specified absolute invariants, raising a
+        :class:`ValueError` if no such curve exists. Over inexact rings, a
+        :class:`ValueError` is raised unless the invariants are the base change
+        of invariants over an exact rings where some precomputations (e.g. the
+        automorphism group) have been performed. At present, the curve equation
+        is not minimized, and will not have the same modular invariants in
+        general. At present, the algorithm may fail over non-algebraically
+        closed fields in the presence of extra automorphisms, even if the curve
+        exists.
 
         EXAMPLES::
 
             sage: from pyhdme import PPASInvariants
-            sage: vec = PPASInvariants([1, 0, 0, 2, 4, 4, 1]).modular_invariants()
+            sage: vec = PPASInvariants([1, 0, 0, 2, 4, 4, 1]).absolute_igusa_invariants()
             sage: crv = PPASInvariants(vec).genus_2_curve_equation()
-            sage: PPASInvariants(crv).modular_invariants() == vec
+            sage: PPASInvariants(crv).absolute_igusa_invariants() == vec
             True
 
         TESTS::
 
             sage: from pyhdme import PPASInvariants
-            sage: def check(coeffs): vec = PPASInvariants(coeffs).modular_invariants(); crv = PPASInvariants(vec).genus_2_curve_equation(); return PPASInvariants(crv).modular_invariants == vec
+            sage: def check(coeffs): vec = PPASInvariants(coeffs).modular_invariants(); crv = PPASInvariants(vec).genus_2_curve_equation(); return PPASInvariants(crv).absolute_igusa_invariants() == PPASInvariants(coeffs).absolute_igusa_invariants()
             sage: check([0, 8, -12, 4, 4, -4, 1])
-            True
+            Traceback (most recent call last):
+            ...
+            ValueError: Could not extract a square root of 2 in Rational Field
             sage: check([0, 4, 0, 0, 0, 0, 1])
             True
-            sage: check([1, 4, 6, 2, 1, 2, 1])
+            sage: check([1, 0, 0, 23, 0, 0, 1])
             True
             sage: check([4, 0, 0, 0, 0, 0, 1])
             True
@@ -922,33 +979,54 @@ class PPASInvariants(SageObject):
 
         if n == 2:
             # Mestre's algorithm
-            x, y, z = PPASInvariants.parametrize_conic(self.mestre_conic_point(),
-                                                       self.mestre_conic_coefficients(), t)
-            U = self.mestre_U()
-            I10 = self.igusa_clebsch_invariants()[3]
-            A, B, C, D = self.clebsch_invariants()
-            c111 = 8 * (A**2 * C - 6 * B * C + 9 * D)/36
-            c112 = 4 * (2 * B**3 + 4 * A * B * C + 12 * C**2 + 3 * A * D)/36
-            c113 = 4 * (A * B**3 + 4 * A**2 * B * C/3 + 4 * B**2 * C + 6 * A * C**2 + 3 * B * D)/36
-            c122 = 4 * (A * B**3 + 4 * A**2 * B * C/3 + 4 * B**2 * C + 6 * A * C**2 + 3 * B * D)/36
-            c123 = 2 * (2 * B**4 + 4 * A * B**2 * C + 4 * A**2 * C**2/3 + 4 * B * C**2 + 3 * A * B * D + 12 * C * D)/36
-            c133 = 2 * (A * B**4 + 4 * A**2 * B**2 * C/3 + 16 * B**3 * C/3 + 26 * A * B * C**2/3 +  8 * C**3 + 3 * B**2 * D + 2 * A * C * D)/36
-            c222 = 4 * (3 * B**4 + 6 * A * B**2 * C + 8 * A**2 * C**2/3 + 2 * B * C**2 - 3 * C * D)/36
-            c223 = 2 * (-2 * B**3 * C/3 - 4 * A * B * C**2/3 - 4 * C**3 + 9 * B**2 * D + 8 * A * C * D)/36
-            c233 = 2 * (B**5 + 2 * A * B**3 * C + 8 * A**2 * B * C**2/9 + 2 * B**2 * C**2/3  - B * C * D + 9 * D**2)/36
-            c333 = 1 * (-2 * B**4 * C - 4 * A * B**2 * C**2 - 16 * A**2 * C**3/9 - 4 * B * C**3/3  + 9 * B**3 * D + 12 * A * B * C * D + 20 * C**2 * D)/36
+            x, y, z = self.mestre_conic_coefficients()[1]
+            # setting the cijk from Mestre's algorithm
+            c111 = 12*x*y - 2*y/3 - 4*z
+            c112 = -18*x**3 - 12*x*y - 36*y**2 - 2*z
+            c113 = -9*x**3 - 36*x**2*y - 4*x*y - 6*x*z - 18*y**2
+            c122 = c113
+            c123 = -54*x**4 - 36*x**2*y - 36*x*y**2 - 6*x*z - 4*y**2 - 24*y*z
+            c133 = -27*x**4/2 - 72*x**3*y - 6*x**2*y - 9*x**2*z - 39*x*y**2 - \
+                36*y**3 - 2*y*z
+            c222 = -27*x**4 - 18*x**2*y - 6*x*y**2 - 8*y**2/3 + 2*y*z
+            c223 = 9*x**3*y - 27*x**2*z + 6*x*y**2 + 18*y**3 - 8*y*z
+            c233 = -81*x**5/2 - 27*x**3*y - 9*x**2*y**2 - 4*x*y**2 + 3*x*y*z - 6*z**2
+            c333 = 27*x**4*y/2 - 27*x**3*z/2 + 9*x**2*y**2 + 3*x*y**3 - 6*x*y*z + \
+                4*y**3/3 - 10*y**2*z
+            # writing out the hyperelliptic curve polynomial
+            F1, F2, F3 = PPASInvariants.parametrize_conic(self.mestre_conic_point(),
+                                                          self.mestre_conic_coefficients()[0], t)
+            crv = c111*F1**3 + c112*F1**2*F2 + c113*F1**2*F3 + c122*F1*F2**2 + \
+                  c123*F1*F2*F3 + c133*F1*F3**2 + c222*F2**3 + c223*F2**2*F3 + \
+                  c233*F2*F3**2 + c333*F3**3
 
-            t111 = c111 * U**3 * I10**12 * x**3
-            t112 = 3 * c112 * U**2 * I10**13 * x**2 * y
-            t113 = 3 * c113 * U**6 * I10**8 * x**2 * z
-            t122 = 3 * c122 * U * I10**14 * x * y**2
-            t123 = 6 * c123 * U**5 * I10**9 * x * y * z
-            t133 = 3 * c133 * U**9 * I10**4 * x * z**2
-            t222 = c222 * I10**15 * y**3
-            t223 = 3 * c223 * U**4 * I10**10 * y**2 * z
-            t233 = 3 * c233 * U**8 * I10**5 * y * z**2
-            t333 = c333 * U**12 * z**3
-            self.__g2_curve =  t111 + t112 + t113 + t122 + t123 + t133 + t222 + t223 + t233 + t333
+            # x, y, z = PPASInvariants.parametrize_conic(self.mestre_conic_point(),
+            #                                            self.mestre_conic_coefficients(), t)
+            # U = self.mestre_U()
+            # I10 = self.igusa_clebsch_invariants()[3]
+            # A, B, C, D = self.clebsch_invariants()
+            # c111 = 8 * (A**2 * C - 6 * B * C + 9 * D)/36
+            # c112 = 4 * (2 * B**3 + 4 * A * B * C + 12 * C**2 + 3 * A * D)/36
+            # c113 = 4 * (A * B**3 + 4 * A**2 * B * C/3 + 4 * B**2 * C + 6 * A * C**2 + 3 * B * D)/36
+            # c122 = 4 * (A * B**3 + 4 * A**2 * B * C/3 + 4 * B**2 * C + 6 * A * C**2 + 3 * B * D)/36
+            # c123 = 2 * (2 * B**4 + 4 * A * B**2 * C + 4 * A**2 * C**2/3 + 4 * B * C**2 + 3 * A * B * D + 12 * C * D)/36
+            # c133 = 2 * (A * B**4 + 4 * A**2 * B**2 * C/3 + 16 * B**3 * C/3 + 26 * A * B * C**2/3 +  8 * C**3 + 3 * B**2 * D + 2 * A * C * D)/36
+            # c222 = 4 * (3 * B**4 + 6 * A * B**2 * C + 8 * A**2 * C**2/3 + 2 * B * C**2 - 3 * C * D)/36
+            # c223 = 2 * (-2 * B**3 * C/3 - 4 * A * B * C**2/3 - 4 * C**3 + 9 * B**2 * D + 8 * A * C * D)/36
+            # c233 = 2 * (B**5 + 2 * A * B**3 * C + 8 * A**2 * B * C**2/9 + 2 * B**2 * C**2/3  - B * C * D + 9 * D**2)/36
+            # c333 = 1 * (-2 * B**4 * C - 4 * A * B**2 * C**2 - 16 * A**2 * C**3/9 - 4 * B * C**3/3  + 9 * B**3 * D + 12 * A * B * C * D + 20 * C**2 * D)/36
+
+            # t111 = c111 * U**3 * I10**12 * x**3
+            # t112 = 3 * c112 * U**2 * I10**13 * x**2 * y
+            # t113 = 3 * c113 * U**6 * I10**8 * x**2 * z
+            # t122 = 3 * c122 * U * I10**14 * x * y**2
+            # t123 = 6 * c123 * U**5 * I10**9 * x * y * z
+            # t133 = 3 * c133 * U**9 * I10**4 * x * z**2
+            # t222 = c222 * I10**15 * y**3
+            # t223 = 3 * c223 * U**4 * I10**10 * y**2 * z
+            # t233 = 3 * c233 * U**8 * I10**5 * y * z**2
+            # t333 = c333 * U**12 * z**3
+            # crv =  t111 + t112 + t113 + t122 + t123 + t133 + t222 + t223 + t233 + t333
 
         elif n == 4:
             # Cardona's algorithm
@@ -976,38 +1054,53 @@ class PPASInvariants(SageObject):
             t133 = 3 * A22 * a133 * x * z**2
             t222 = -A33 * a222 * y**3
             t333 = 3 * A22 * a233 * x * z**2
-            self.__g2_curve = t111 + t112 + t122 + t133 + t222 + t333
+            crv = t111 + t112 + t122 + t133 + t222 + t333
 
         elif n == 8:
             try:
                 a = self.base_ring()(sqrt(self._bolza_a2()))
             except (ValueError, TypeError):
                 raise ValueError("Could not extract a square root of {} in {}".format(self._bolza_a2(), self.base_ring()))
-            self.__g2_curve =  t**5 + a * t**3 + t
+            crv =  t**5 + a * t**3 + t
 
         elif n == 10:
-            self.__g2_curve = t**6 + t
+            crv = t**6 + t
 
         elif n == 12:
             try:
                 a = self.base_ring()(sqrt(self._bolza_a2()))
             except (ValueError, TypeError):
                 raise ValueError("Could not extract a square root of {} in {}".format(self._bolza_a2(), self.base_ring()))
-            self.__g2_curve =  t**6 + a * t**3 + 1
+            crv =  t**6 + a * t**3 + 1
 
         elif n == 24:
-            self.__g2_curve = t**6 + 1
+            crv = t**6 + 1
 
         else:
             assert n == 48, "Unknown automorphism group order: {}".format(n)
-            self.__g2_curve = t**5 + t
+            crv = t**5 + t
 
+        # Make coefficients look nicer?
+        # try:
+        #     crv = crv * crv.denominator()
+        #     crv = crv / gcd([x.numerator() for x in crv.coefficients()])
+        # except (AttributeError, TypeError):
+        #     pass
         # Adjust genus 2 curve equation to achieve the given invariants
-        new_IC = PPASInvariants.modified_igusa_clebsch_from_curve(self.__g2_curve)
-        alpha = PPASInvariants.find_rescaling(self.base_ring(), new_IC, self.modified_igusa_clebsch_invariants(),
-                                              self.minimal_weight_combination(), [4, 6, 10, 12])
-        self.__g2_curve = self.__g2_curve.subs(t / alpha)
+        # new_IC = PPASInvariants.modified_igusa_clebsch_from_curve(crv)
+        # alpha = PPASInvariants.find_rescaling(self.base_ring(), new_IC, self.modified_igusa_clebsch_invariants(),
+        #                                       self.minimal_weight_combination(), [4, 6, 10, 12])
+        # crv = alpha**2 * crv.subs(t / alpha)
+        # Make coefficients look nicer
+        # if self.base_ring().is_exact():
+        #     u = crv.coefficient(4)
+        #     v = crv.coefficient(2)
+        #     if u != 0:
+        #         crv = u**3 * crv.subs(t / u)
+        #     elif v != 0:
+        #         crv = v**(-3) * crv.subs(t * v)
 
+        self.__g2_curve = crv
         return self.__g2_curve
 
     def j_invariants_quadratic_equation(self):
