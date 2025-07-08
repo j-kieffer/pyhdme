@@ -927,18 +927,14 @@ class PPASInvariants(SageObject):
         return pt
 
     def genus_2_curve_equation(self):
-        r"""b
-
+        r"""
         Return a genus 2 curve equation over the base ring of self which
         realizes the specified absolute invariants, raising a
         :class:`ValueError` if no such curve exists. Over inexact rings, a
         :class:`ValueError` is raised unless the invariants are the base change
         of invariants over an exact rings where some precomputations (e.g. the
-        automorphism group) have been performed. At present, the curve equation
-        is not minimized, and will not have the same modular invariants in
-        general. At present, the algorithm may fail over non-algebraically
-        closed fields in the presence of extra automorphisms, even if the curve
-        exists.
+        automorphism group) have been performed. The curve equation is not
+        minimized, and will not have the same modular invariants in general.
 
         EXAMPLES::
 
@@ -953,12 +949,10 @@ class PPASInvariants(SageObject):
             sage: from pyhdme import PPASInvariants
             sage: def check(coeffs): vec = PPASInvariants(coeffs).modular_invariants(); crv = PPASInvariants(vec).genus_2_curve_equation(); return PPASInvariants(crv).absolute_igusa_invariants() == PPASInvariants(coeffs).absolute_igusa_invariants()
             sage: check([0, 8, -12, 4, 4, -4, 1])
-            Traceback (most recent call last):
-            ...
-            ValueError: Could not extract a square root of 2 in Rational Field
+            True
             sage: check([0, 4, 0, 0, 0, 0, 1])
             True
-            sage: check([1, 0, 0, 23, 0, 0, 1])
+            sage: check([1, 4, 6, 2, 1, 2, 1])
             True
             sage: check([4, 0, 0, 0, 0, 0, 1])
             True
@@ -1057,21 +1051,13 @@ class PPASInvariants(SageObject):
             crv = t111 + t112 + t122 + t133 + t222 + t333
 
         elif n == 8:
-            try:
-                a = self.base_ring()(sqrt(self._bolza_a2()))
-            except (ValueError, TypeError):
-                raise ValueError("Could not extract a square root of {} in {}".format(self._bolza_a2(), self.base_ring()))
-            crv =  t**5 + a * t**3 + t
+            crv =  t**5 + t**3 + (1 / self._bolza_a2()) * t
 
         elif n == 10:
             crv = t**6 + t
 
         elif n == 12:
-            try:
-                a = self.base_ring()(sqrt(self._bolza_a2()))
-            except (ValueError, TypeError):
-                raise ValueError("Could not extract a square root of {} in {}".format(self._bolza_a2(), self.base_ring()))
-            crv =  t**6 + a * t**3 + 1
+            crv =  t**6 + t**3 + (1 / self._bolza_a2())
 
         elif n == 24:
             crv = t**6 + 1
