@@ -926,7 +926,7 @@ class PPASInvariants(SageObject):
             #     pass
         return pt
 
-    def genus_2_curve_equation(self):
+    def genus_2_curve_equation(self, same_invariants = False):
         r"""
         Return a genus 2 curve equation over the base ring of self which
         realizes the specified absolute invariants, raising a
@@ -934,29 +934,47 @@ class PPASInvariants(SageObject):
         :class:`ValueError` is raised unless the invariants are the base change
         of invariants over an exact rings where some precomputations (e.g. the
         automorphism group) have been performed. The curve equation is not
-        minimized, and will not have the same modular invariants in general.
+        minimized.
+
+        If "same_invariants" is False (default), the modular invariants of self
+        are modified to match the computed curve equation, while keeping the
+        same point in weighted projective space P(2,3,5,6). Otherwise, the
+        curve equation is rescaled to match the computed invariants; this may
+        fail over non-algebraically closed fields.
 
         EXAMPLES::
 
             sage: from pyhdme import PPASInvariants
-            sage: vec = PPASInvariants([1, 0, 0, 2, 4, 4, 1]).absolute_igusa_invariants()
+            sage: vec = PPASInvariants([1, 2, 3, 4]).absolute_igusa_invariants()
             sage: crv = PPASInvariants(vec).genus_2_curve_equation()
             sage: PPASInvariants(crv).absolute_igusa_invariants() == vec
             True
+            sage: PPASInvariants(crv).modular_invariants() == [1, 2, 3, 4]
+            False
+            sage: vec = PPASInvariants([1, 0, 0, 2, 4, 4, 1]).modular_invariants()
+            sage: crv = PPASInvariants(vec).genus_2_curve_equation(same_invariants = True)
+            sage: PPASInvariants(crv).modular_invariants() == vec
+            True
+            sage: vec = [1, 2, 3, 4]
+            sage: crv = PPASInvariants(vec).genus_2_curve_equation(same_invariants = True)
+            Traceback (most recent call last):
+            ...
+            ValueError: Could not extract a 2th root of -776530813792251729016177857675101017435797423118579422943574066637613608874904078971127288329976286075916901/2068001658293095566095155200000000000000000000000000 in Rational Field
 
         TESTS::
 
             sage: from pyhdme import PPASInvariants
-            sage: def check(coeffs): vec = PPASInvariants(coeffs).modular_invariants(); crv = PPASInvariants(vec).genus_2_curve_equation(); return PPASInvariants(crv).absolute_igusa_invariants() == PPASInvariants(coeffs).absolute_igusa_invariants()
-            sage: check([0, 8, -12, 4, 4, -4, 1])
-            True
+            sage: def check(coeffs): vec = PPASInvariants(coeffs).modular_invariants(); crv = PPASInvariants(vec).genus_2_curve_equation(same_invariants = True); return PPASInvariants(crv).modular_invariants() == vec
             sage: check([0, 4, 0, 0, 0, 0, 1])
             True
-            sage: check([1, 4, 6, 2, 1, 2, 1])
-            True
-            sage: check([4, 0, 0, 0, 0, 0, 1])
+            sage: check([2, 0, 0, 0, 0, 0, 1])
             True
             sage: check([0, 1, 0, 0, 0, -1, 0])
+            True
+            sage: def check2(coeffs): vec = PPASInvariants(coeffs).absolute_igusa_invariants(); crv = PPASInvariants(vec).genus_2_curve_equation(); return PPASInvariants(crv).absolute_igusa_invariants() == vec
+            sage: check2([0, 8, -12, 4, 4, -4, 1])
+            True
+            sage: check2([1, 4, 6, 2, 1, 2, 1])
             True
 
         """
@@ -1022,6 +1040,13 @@ class PPASInvariants(SageObject):
             # t333 = c333 * U**12 * z**3
             # crv =  t111 + t112 + t113 + t122 + t123 + t133 + t222 + t223 + t233 + t333
 
+            if same_invariants:
+                # Fail if cannot find rescaling by [4, 6, 10, 12], as the only twists are quadratic twists
+                new_IC = PPASInvariants.modified_igusa_clebsch_from_curve(crv)
+                alpha = PPASInvariants.find_rescaling(self.base_ring(), new_IC, self.modified_igusa_clebsch_invariants(),
+                                                      self.minimal_weight_combination(), [4, 6, 10, 12])
+                crv = crv / alpha
+
         elif n == 4:
             # Cardona's algorithm
             # Coefficients of conic
@@ -1049,22 +1074,61 @@ class PPASInvariants(SageObject):
             t222 = -A33 * a222 * y**3
             t333 = 3 * A22 * a233 * x * z**2
             crv = t111 + t112 + t122 + t133 + t222 + t333
+            if same_invariants:
+                new_IC = PPASInvariants.modified_igusa_clebsch_from_curve(crv)
+                try:
+                    alpha = PPASInvariants.find_rescaling(self.base_ring(), new_IC, self.modified_igusa_clebsch_invariants(),
+                                                          self.minimal_weight_combination(), [4, 6, 10, 12])
+                    crv = crv / alpha
+                except ValueError:
+                    raise NotImplementedError("Curve reconstruction with the same invariants over a non-algebraically closed field in the presence of geometric automorphisms is not fully implemented")
 
         elif n == 8:
             crv =  t**5 + t**3 + (1 / self._bolza_a2()) * t
+            if same_invariants:
+                new_IC = PPASInvariants.modified_igusa_clebsch_from_curve(crv)
+                try:
+                    alpha = PPASInvariants.find_rescaling(self.base_ring(), new_IC, self.modified_igusa_clebsch_invariants(),
+                                                          self.minimal_weight_combination(), [4, 6, 10, 12])
+                    crv = crv / alpha
+                except ValueError:
+                    raise NotImplementedError("Curve reconstruction with the same invariants over a non-algebraically closed field in the presence of geometric automorphisms is not fully implemented")
 
         elif n == 10:
             crv = t**6 + t
+            if same_invariants:
+                new_IC = crv.discriminant()
+                alpha = PPASInvariants.find_rescaling(self.base_ring(), [new_IC], [self.igusa_clebsch_invariants()[3]],
+                                                      [1], [2])
+                crv = alpha * t**6 + t / alpha
 
         elif n == 12:
             crv =  t**6 + t**3 + (1 / self._bolza_a2())
+            if same_invariants:
+                new_IC = PPASInvariants.modified_igusa_clebsch_from_curve(crv)
+                try:
+                    alpha = PPASInvariants.find_rescaling(self.base_ring(), new_IC, self.modified_igusa_clebsch_invariants(),
+                                                          self.minimal_weight_combination(), [4, 6, 10, 12])
+                    crv = crv / alpha
+                except ValueError:
+                    raise NotImplementedError("Curve reconstruction with the same invariants over a non-algebraically closed field in the presence of geometric automorphisms is not fully implemented")
 
         elif n == 24:
             crv = t**6 + 1
+            if same_invariants:
+                new_IC = PPASInvariants.modified_igusa_clebsch_from_curve(crv)
+                alpha = PPASInvariants.find_rescaling(self.base_ring(), new_IC, self.modified_igusa_clebsch_invariants(),
+                                                      self.minimal_weight_combination(), [2, 3, 5, 6])
+                crv = t**6 + (1 / alpha)
 
         else:
             assert n == 48, "Unknown automorphism group order: {}".format(n)
             crv = t**5 + t
+            if same_invariants:
+                new_IC = PPASInvariants.modified_igusa_clebsch_from_curve(crv)
+                alpha = PPASInvariants.find_rescaling(self.base_ring(), new_IC, self.modified_igusa_clebsch_invariants(),
+                                                      self.minimal_weight_combination(), [2, 3, 5, 6])
+                crv = t**5 + (1 / alpha) * t
 
         # Make coefficients look nicer?
         # try:
@@ -1073,10 +1137,6 @@ class PPASInvariants(SageObject):
         # except (AttributeError, TypeError):
         #     pass
         # Adjust genus 2 curve equation to achieve the given invariants
-        # new_IC = PPASInvariants.modified_igusa_clebsch_from_curve(crv)
-        # alpha = PPASInvariants.find_rescaling(self.base_ring(), new_IC, self.modified_igusa_clebsch_invariants(),
-        #                                       self.minimal_weight_combination(), [4, 6, 10, 12])
-        # crv = alpha**2 * crv.subs(t / alpha)
         # Make coefficients look nicer
         # if self.base_ring().is_exact():
         #     u = crv.coefficient(4)
