@@ -16,7 +16,7 @@
 #include <flint/acb_mat.h>
 #include "flint_compat.h"
 
-int arb_mat_not_minkowski_reduced(const arb_mat_t r, slong prec);
+int siegel_not_minkowski_reduced(const arb_mat_t r, slong prec);
 
 int siegel_not_real_reduced(const acb_mat_t z, slong prec);
 
