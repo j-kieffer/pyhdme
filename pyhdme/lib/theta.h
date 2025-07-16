@@ -92,49 +92,9 @@ int theta_char_is_syzygous(ulong ch1, ulong ch2, ulong ch3, slong g);
 
 void theta_duplication(acb_ptr th2_2tau, acb_srcptr th_tau, slong prec);
 
-int theta_0123_naive_B(fmpz_t B, const acb_mat_t tau, slong prec);
-
-int theta_0123_naive(acb_ptr th, const acb_mat_t tau, slong prec);
-
-int theta2_naive(acb_ptr th, const acb_mat_t tau, slong prec);
-
 int theta2_inverse(acb_mat_t tau, acb_srcptr th, slong prec);
 
-int theta2_inverse_no_sqrt(acb_mat_t tau, acb_srcptr th, slong prec);
-
 int theta2_invalid(acb_srcptr th2, slong prec);
-
-int theta_0123half_diff_naive(acb_mat_t dth, const acb_mat_t tau, slong prec);
-
-int theta_0123half_inverse(acb_mat_t tau, acb_srcptr th_half, slong prec);
-
-int theta_0123half_inverse_no_sqrt(acb_mat_t tau, acb_srcptr th_half, slong prec);
-
-int theta_0123half_inverse_diff(acb_mat_t dtau, const acb_mat_t tau, acb_srcptr th_half,
-				slong prec);
-
-int theta2_newton_step(acb_ptr th_half, const acb_mat_t tau, acb_srcptr th_half_approx,
-		       slong prec);
-
-slong theta2_newton_start_prec(slong prec);
-
-int theta2_newton(acb_ptr th2, const acb_mat_t tau, slong prec);
-
-slong theta_newton_k2(acb_mat_t w, const acb_mat_t z, slong prec);
-
-slong theta_newton_k1(acb_mat_t w, const acb_mat_t z, slong prec);
-
-int theta_use_naive(const acb_mat_t tau, slong prec);
-
-int theta_use_newton(const acb_mat_t tau, slong prec);
-
-ulong theta_transform_image_char(fmpz_t epsilon, ulong ch, const fmpz_mat_t eta);
-
-void theta_transform_matrix(fmpz_mat_t res, const fmpz_mat_t eta);
-
-void theta_transform(acb_ptr th_eta, const fmpz_mat_t eta, acb_srcptr th, slong prec);
-
-void theta2_transform(acb_ptr th2_eta, const fmpz_mat_t eta, acb_srcptr th2, slong prec);
 
 int theta2_unif(acb_ptr th2, const acb_mat_t tau, slong prec);
 

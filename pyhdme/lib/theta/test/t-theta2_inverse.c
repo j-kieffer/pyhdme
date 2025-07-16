@@ -44,7 +44,7 @@ int main()
 	  flint_abort();
 	}
 
-      res = theta2_naive(th, tau, prec);
+      res = theta2_unif(th, tau, prec);
       if (!res)
 	{
 	  flint_printf("FAIL (naive theta)\n");
