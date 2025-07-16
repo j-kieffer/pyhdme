@@ -72,10 +72,6 @@ slong theta_char_get_label_g2(ulong ch);
 
 ulong theta_char_set_label_g2(slong label);
 
-int theta_char_is_goepel(ulong ch1, ulong ch2, ulong ch3, ulong ch4, slong g);
-
-int theta_char_is_syzygous(ulong ch1, ulong ch2, ulong ch3, slong g);
-
 
 /* Theta constants */
 

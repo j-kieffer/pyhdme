@@ -29,10 +29,6 @@
 
 /* Additional functions for real and complex matrices */
 
-void acb_mat_get_real(arb_mat_t re, const acb_mat_t z);
-
-void acb_mat_get_imag(arb_mat_t im, const acb_mat_t z);
-
 void acb_mat_set_arb_arb(acb_mat_t z, const arb_mat_t re, const arb_mat_t im);
 
 void acb_mat_set_window(acb_mat_t z, slong j, slong k, const acb_mat_t w);
