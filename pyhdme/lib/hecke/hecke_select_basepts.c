@@ -17,7 +17,7 @@ int hecke_select_basepts(acb_mat_struct* pts, acb_mat_t basis_inv,
     {
       for (k = 0; k < nb; k++)
 	{
-	  siegel_fundamental_domain_randtest(&pts[k], state, prec);
+            acb_siegel_randtest_compact(&pts[k], state, 1, prec);
 	}
       res = hecke_basis_matrix(basis_inv, nb, pts, wt, prec);
       if (!res) continue;

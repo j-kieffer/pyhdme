@@ -52,7 +52,7 @@ void siegel_coset(fmpz_mat_t m, slong k, slong ell)
 	  /* Special etaR in this case */
 	  if (c == 0)
 	    {
-	      fmpz_mat_J(etaR);
+	      sp2gz_j(etaR);
 	    }
 	  else
 	    {
@@ -160,13 +160,13 @@ void siegel_coset(fmpz_mat_t m, slong k, slong ell)
       fmpz_mat_set(etaR, temp);
     }
   
-  if (!fmpz_mat_is_symplectic(eta) || !fmpz_mat_is_symplectic(etaR))
+  if (!sp2gz_is_correct(eta) || !sp2gz_is_correct(etaR))
     {
       fmpz_mat_print(eta);
       fmpz_mat_print(etaR);
       flint_printf("k = %wd, a = %wd, b = %wd, c = %wd, ell = %wd\n", k, a, b, c, ell);
       flint_printf("eta is symplectic? %wd; etaR is symplectic? %wd\n",
-		   fmpz_mat_is_symplectic(eta), fmpz_mat_is_symplectic(etaR));
+		   sp2gz_is_correct(eta), sp2gz_is_correct(etaR));
       fflush(stdout);
       flint_abort();
     }

@@ -27,10 +27,10 @@ siegel_not_in_fundamental_domain(const acb_mat_t z, slong prec)
   if (!res)
     {
       /* Test matrices */
-      for (j = 0; j < siegel_nb_test_matrices(g); j++)
+      for (j = 0; j < sp2gz_nb_fundamental(g); j++)
 	{
-	  siegel_test_matrix(test, j);
-	  siegel_star(star, test, z, prec);
+	  sp2gz_fundamental(test, j);
+	  acb_siegel_cocycle(star, test, z, prec);
 	  acb_mat_det(det, star, prec);
 	  acb_abs(absdet, det, prec);
 	  arb_sub_si(absdet, absdet, 1, prec);

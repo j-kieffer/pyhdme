@@ -1,20 +1,16 @@
 
+#include <flint/acb_theta.h>
 #include "hecke.h"
 
 int hecke_set_entry(hecke_t H, slong k, const fmpz_mat_t gamma, slong prec)
 {
   acb_mat_t im;
   fmpz_mat_t eta;
-  arb_t tol;
   int res;
   slong nb = hecke_nb(H);
 
   acb_mat_init(im, 2, 2);
   fmpz_mat_init(eta, 4, 4);
-  arb_init(tol);
-
-  arb_one(tol);
-  arb_mul_2exp_si(tol, tol, -HECKE_RED_TOL_BITS);
 
   /* Sanity check before using macros */
   if (k < 0 || k >= nb) {
@@ -24,13 +20,15 @@ int hecke_set_entry(hecke_t H, slong k, const fmpz_mat_t gamma, slong prec)
     flint_abort();
   }
 
-  res = siegel_transform(im, gamma, hecke_tau(H), prec);
-  if (res) res = siegel_fundamental_domain(hecke_isog(H, k), eta, im, tol, prec);
+  acb_siegel_transform(im, gamma, hecke_tau(H), prec);
+  acb_siegel_reduce(eta, im, prec);
+  acb_siegel_transform(hecke_isog(H, k), eta, im, prec);
+  res = acb_siegel_is_reduced(hecke_isog(H, k), -HECKE_RED_TOL_BITS, prec);
 
   if (res) {
     /* Can fill hecke_coset, hecke_star */
     fmpz_mat_mul(hecke_coset(H, k), eta, gamma);
-    siegel_star(hecke_star(H, k), hecke_coset(H, k), hecke_tau(H), prec);
+    acb_siegel_cocycle(hecke_star(H, k), hecke_coset(H, k), hecke_tau(H), prec);
     acb_mat_det(hecke_stardet(H, k), hecke_star(H, k), prec);
 
     /* Compute projective vector of theta constants */
@@ -41,6 +39,5 @@ int hecke_set_entry(hecke_t H, slong k, const fmpz_mat_t gamma, slong prec)
 
   acb_mat_clear(im);
   fmpz_mat_clear(eta);
-  arb_clear(tol);
   return res;
 }

@@ -1,6 +1,28 @@
 
 #include "hilbert.h"
 
+static void hilbert_mat_map_set_window(acb_mat_t z, slong j, slong k, const acb_mat_t w)
+{
+  slong u, v;
+
+  if (j + acb_mat_nrows(w) > acb_mat_nrows(z)
+      || k + acb_mat_ncols(w) > acb_mat_ncols(z))
+    {
+      flint_printf("(hilbert_mat_map_set_window) Wrong dimensions\n");
+      fflush(stdout);
+      flint_abort();
+    }
+  
+  for (u = 0; u < acb_mat_nrows(w); u++)
+    {
+      for (v = 0; v < acb_mat_ncols(w); v++)
+	{
+	  acb_set(acb_mat_entry(z, j+u, k+v),
+		  acb_mat_entry(w, u, v));
+	}
+    }
+}
+
 void hilbert_mat_map(fmpz_mat_t eta, const fmpz_poly_mat_t m, slong delta)
 {
   slong prec = 100;
@@ -37,8 +59,8 @@ void hilbert_mat_map(fmpz_mat_t eta, const fmpz_poly_mat_t m, slong delta)
       acb_mat_inv(Ri, Ri, prec);
       
       acb_mat_zero(M);
-      acb_mat_set_window(M, 0, 0, Rt);
-      acb_mat_set_window(M, 2, 2, Ri);
+      hilbert_mat_map_set_window(M, 0, 0, Rt);
+      hilbert_mat_map_set_window(M, 2, 2, Ri);
       acb_mat_inv(P, M, prec);
 
       hilbert_sigma1(acb_mat_entry(N, 0, 0),

@@ -28,7 +28,7 @@ hilbert_bw_M0(fmpz_mat_t m, fmpz* abcde)
   fmpz_divexact(fmpz_mat_entry(M0, 3, 3), &abcde[4], g0);
 
   fmpz_mat_set(m, M0);
-  if (!fmpz_mat_is_symplectic(m))
+  if (!sp2gz_is_correct(m))
     {
       flint_printf("(hilbert_bw_M0) Incorrect m\n");
       fmpz_mat_print(m);
@@ -129,7 +129,7 @@ hilbert_bw_M1(fmpz_mat_t m, fmpz* abcde)
   fmpz_mat_one(M1);
   fmpz_neg(fmpz_mat_entry(M1, 0, 2), n);
   fmpz_mat_set(m, M1);
-  if (!fmpz_mat_is_symplectic(m))
+  if (!sp2gz_is_correct(m))
     {
       flint_printf("(hilbert_bw_M1) Incorrect m\n");
       fmpz_mat_print(m);
@@ -176,7 +176,7 @@ hilbert_bw_M2(fmpz_mat_t m, fmpz* abcde)
   fmpz_divexact(fmpz_mat_entry(M2, 3, 3), &abcde[4], g2);
 
   fmpz_mat_set(m, M2);
-  if (!fmpz_mat_is_symplectic(m))
+  if (!sp2gz_is_correct(m))
     {
       flint_printf("(hilbert_bw_M2) Incorrect m\n");
       fmpz_mat_print(m);
@@ -268,7 +268,7 @@ hilbert_bw_M3(fmpz_mat_t m, fmpz* abcde)
   fmpz_set(fmpz_mat_entry(M3, 3, 3), eta);
 
   fmpz_mat_set(m, M3);
-  if (!fmpz_mat_is_symplectic(m))
+  if (!sp2gz_is_correct(m))
     {
       flint_printf("(hilbert_bw_M3) Incorrect m\n");
       fmpz_mat_print(m);
@@ -366,7 +366,7 @@ hilbert_bw_M4(fmpz_mat_t m, fmpz* abcde)
   fmpz_set(fmpz_mat_entry(M4, 3, 3), nu);
 
   fmpz_mat_set(m, M4);
-  if (!fmpz_mat_is_symplectic(m))
+  if (!sp2gz_is_correct(m))
     {
       flint_printf("(hilbert_bw_M4) Incorrect m\n");
       fmpz_mat_print(m);
@@ -380,7 +380,7 @@ hilbert_bw_M4(fmpz_mat_t m, fmpz* abcde)
   fmpz_mat_mul(M4, M4, M4prime);
   
   fmpz_mat_set(m, M4);
-  if (!fmpz_mat_is_symplectic(m))
+  if (!sp2gz_is_correct(m))
     {
       flint_printf("(hilbert_bw_M4) Incorrect m\n");
       fmpz_mat_print(m);
@@ -467,7 +467,7 @@ hilbert_bw_M5(fmpz_mat_t m, fmpz* abcde)
   fmpz_neg(fmpz_mat_entry(M5, 2, 3), t);
 
   fmpz_mat_set(m, M5);
-  if (!fmpz_mat_is_symplectic(m))
+  if (!sp2gz_is_correct(m))
     {
       flint_printf("(hilbert_bw_M5) Incorrect m\n");
       fmpz_mat_print(m);
@@ -510,7 +510,7 @@ int hilbert_inverse(acb_ptr t, fmpz_mat_t eta, const acb_mat_t tau,
       hilbert_bw_M5(m, abcde);
       fmpz_mat_mul(eta, m, eta);
 
-      siegel_transform(im, eta, tau, prec);
+      acb_siegel_transform(im, eta, tau, prec);
       acb_mat_inv(R, R, prec);
       acb_mat_mul(im, im, R, prec);
       acb_mat_transpose(R, R);
