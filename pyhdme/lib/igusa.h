@@ -64,16 +64,6 @@
 
 /* Igusa covariants from theta constants */
 
-void igusa_h4(acb_t h4, acb_srcptr theta2, slong prec);
-
-void igusa_h6(acb_t h6, acb_srcptr theta2, slong prec);
-
-void igusa_h10(acb_t h10, acb_srcptr theta2, slong prec);
-
-void igusa_h12(acb_t h12, acb_srcptr theta2, slong prec);
-
-void igusa_h16(acb_t h16, acb_srcptr theta2, slong prec);
-
 #define igusa_psi4(I) &(I)[0]
 #define igusa_psi6(I) &(I)[1]
 #define igusa_chi10(I) &(I)[2]

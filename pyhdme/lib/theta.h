@@ -27,17 +27,6 @@
 #include "siegel.h"
 #include "verbose.h"
 
-#define THETA_NEWTON_MINPREC 100
-#define THETA_NEWTON_LOSS 25
-#define THETA_NEWTON_DERIVATIVE_OFFSET 10
-#define THETA_NEWTON_BASEPREC 4000
-#define THETA_NEWTON_Y1 5000
-#define THETA_NEWTON_Y2MAX 10
-#define THETA_NEWTON_TOL_EXP -5
-#define THETA_DER_LOSS 25
-
-
-
 /* Borchardt means */
 
 int acb_sqrt_goodpos(acb_t r, const acb_t z, slong prec);
