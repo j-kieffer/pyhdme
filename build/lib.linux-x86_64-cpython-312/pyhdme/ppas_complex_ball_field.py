@@ -209,14 +209,3 @@ class PPASComplexBallField(SageObject):
         if self.__gl2_det is None:
             self.__gl2_det = 0 #find rescaling
         return self.__gl2_det
-
-    def hecke_image_invariants(self, ell, step = 1):
-        pass
-
-    def modular_equation_coordinates(self, ell, step = 1):
-        pass
-
-    def modular_equations(self, ell, step = 1):
-        pass
-
-    

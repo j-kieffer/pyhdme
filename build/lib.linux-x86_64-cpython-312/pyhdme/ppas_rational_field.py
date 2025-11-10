@@ -15,7 +15,8 @@ from pyhdme.ppax_complex_ball_field import PPASComplexBallField
 # See LICENSE file for license details.
 
 class PPASRationalField(SageObject):
-    r"""
+    r"""b
+
     Create a data structure encoding a principally polarized abelian surface
     over the rational field, allowing computations with period matrices in
     interval arithmetic at varying precisions.
@@ -109,11 +110,3 @@ class PPASRationalField(SageObject):
             j = pol.roots(ComplexBallField(prec), multiplicities = False)
             return Sequence(j, universe = CC)
 
-    def isogenous_modular_invariants(self, ell, step = 1):
-        pass
-
-    def modular_equation_coordinates(self, ell, step = 1):
-        pass
-
-    def modular_equations(self, ell, step = 1):
-        pass
